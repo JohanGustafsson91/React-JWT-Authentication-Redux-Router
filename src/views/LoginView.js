@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { routeActions } from 'react-router-redux';
 import { loginUser } from '../redux/actions/authentication';
+import classes from '../styles/_stylesheet.css';
 
 const LoginView = React.createClass({
 
@@ -50,19 +51,18 @@ const LoginView = React.createClass({
           <h1>Login</h1>
           {
             this.props.errorText ?
-            <p className='text-danger'>Fel användarnamn eller lösenord</p> : ''
+            <p className='text-danger'>{this.props.errorText}</p> : ''
             }
             <p><input
               type='text'
               className='form-control'
-              defaultValue='admin@mackjakt.se'
+              defaultValue='admin@admin.com'
               disabled={this.props.isAuthenticating}
               ref='username'
               placeholder='Enter username' /></p>
             <p><input
               type='password'
               className='form-control'
-              defaultValue='6OSOFxkx6JEmVXiGmo1M'
               disabled={this.props.isAuthenticating}
               ref='password'
               placeholder='Enter password' /></p>

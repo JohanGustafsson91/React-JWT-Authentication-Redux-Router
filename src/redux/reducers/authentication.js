@@ -2,7 +2,8 @@ import {
   LOGIN_USER_REQUEST,
   LOGIN_USER_SUCCESS,
   LOGOUT_USER,
-  LOGIN_USER_FAILURE
+  LOGIN_USER_FAILURE,
+  UNAUTHORIZED_USER_FAILURE
 } from '../actions/authentication';
 
 /**
@@ -36,7 +37,7 @@ export function auth (state = initialState, action) {
     case LOGIN_USER_SUCCESS:
       return Object.assign({}, state, {
         token: action.token,
-        id: action.user._id,
+        id: action.user.id,
         name: action.user.name,
         email: action.user.email,
         role: action.user.role,
@@ -55,7 +56,20 @@ export function auth (state = initialState, action) {
         role: null,
         isAuthenticated: false,
         isAuthenticating: false,
-        errorText: `Authentication Error: ${action.status} ${action.statusText}`,
+        errorText: `${action.errorText}`,
+        successText: null
+      });
+
+    case UNAUTHORIZED_USER_FAILURE:
+      return Object.assign({}, state, {
+        token: null,
+        id: null,
+        name: null,
+        email: null,
+        role: null,
+        isAuthenticated: false,
+        isAuthenticating: false,
+        errorText: null,
         successText: null
       });
 
