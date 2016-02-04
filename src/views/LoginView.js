@@ -2,7 +2,8 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { routeActions } from 'react-router-redux';
 import { loginUser } from '../redux/actions/authentication';
-import classes from '../styles/_stylesheet.css';
+import classes from '../styles/_stylesheet.scss';
+import PageLoading from '../components/PageLoading';
 
 const LoginView = React.createClass({
 
@@ -44,7 +45,23 @@ const LoginView = React.createClass({
     this.props.dispatch(loginUser(username, password, redirectRoute));
   },
 
+  /**
+   * Return loading view
+   * @return {[type]} [description]
+   */
+  _getLoadingView () {
+    return (
+      <PageLoading />
+    );
+  },
+
   render () {
+
+    // If validating, dont show login view
+    if (this.props.isValidating) {
+      return this._getLoadingView();
+    }
+
     return (
       <div className='row'>
         <div className='col-sm-4 col-sm-offset-4'>
@@ -79,6 +96,7 @@ const LoginView = React.createClass({
 const mapStateToProps = (state) => ({
   isAuthenticated: state.auth.isAuthenticated,
   isAuthenticating: state.auth.isAuthenticating,
+  isValidating: state.auth.isValidating,
   errorText: state.auth.errorText
 });
 

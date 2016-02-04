@@ -7,11 +7,13 @@ import { checkHttpStatus } from '../utils';
 
 // Constants
 export const LOGIN_USER_REQUEST = 'LOGIN_USER_REQUEST';
+export const AUTHORIZE_USER_REQUEST = 'AUTHORIZE_USER_REQUEST';
 export const LOGIN_USER_SUCCESS = 'LOGIN_USER_SUCCESS';
 export const LOGOUT_USER = 'LOGOUT_USER';
 export const LOGIN_USER_FAILURE = 'LOGIN_USER_FAILURE';
 export const UNAUTHORIZED_USER_FAILURE = 'UNAUTHORIZED_USER_FAILURE';
-export const BASE_API_URL = 'http://85.225.169.152:8080';
+export const REFRESH_TOKEN = 'REFRESH_TOKEN';
+export const BASE_API_URL = 'http://localhost:8080';
 
 export function loginUserRequest () {
   return {
@@ -19,8 +21,19 @@ export function loginUserRequest () {
   };
 }
 
+/**
+ * When refreshing, hide login page and show
+ * spinner etc.
+ */
+export function authorizeUserRequest () {
+  return {
+    type: AUTHORIZE_USER_REQUEST
+  };
+}
+
 export function loginUserSuccess (response) {
   localStorage.setItem('token', response.token);
+
   return {
     type: LOGIN_USER_SUCCESS,
     token: response.token,
@@ -78,6 +91,7 @@ export function loginUser (username, password, redirect = '/') {
     .then(checkHttpStatus)
     .then(req => req.json())
     .then(response => {
+      console.log(response);
       try {
         dispatch(loginUserSuccess(response));
         dispatch(routeActions.push(redirect));
@@ -96,10 +110,9 @@ export function loginUser (username, password, redirect = '/') {
   };
 }
 
-
 export function validateUserToken (token, redirect = '/') {
   return dispatch => {
-    dispatch(loginUserRequest());
+    dispatch(authorizeUserRequest());
     return fetch(BASE_API_URL + '/session/refresh', {
       method: 'POST',
       headers: {

@@ -1,5 +1,8 @@
 import React, { PropTypes } from 'react';
 
+import classes from '../styles/_stylesheet.scss';
+import PageLoading from '../components/PageLoading';
+
 const ProfileView = React.createClass({
   render () {
     return (

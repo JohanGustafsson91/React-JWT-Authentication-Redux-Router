@@ -3,7 +3,8 @@ import {
   LOGIN_USER_SUCCESS,
   LOGOUT_USER,
   LOGIN_USER_FAILURE,
-  UNAUTHORIZED_USER_FAILURE
+  UNAUTHORIZED_USER_FAILURE,
+  AUTHORIZE_USER_REQUEST
 } from '../actions/authentication';
 
 /**
@@ -18,6 +19,7 @@ const initialState = {
   role: null,
   isAuthenticated: false,
   isAuthenticating: false,
+  isValidating: false,
   errorText: null,
   successText: null
 };
@@ -34,6 +36,12 @@ export function auth (state = initialState, action) {
         errorText: null
       });
 
+    case AUTHORIZE_USER_REQUEST:
+      return Object.assign({}, state, {
+        isValidating: true,
+        errorText: null
+      });
+
     case LOGIN_USER_SUCCESS:
       return Object.assign({}, state, {
         token: action.token,
@@ -43,6 +51,7 @@ export function auth (state = initialState, action) {
         role: action.user.role,
         isAuthenticated: true,
         isAuthenticating: false,
+        isValidating: false,
         errorText: null,
         successText: 'You have been successfully logged in.'
       });
@@ -56,6 +65,7 @@ export function auth (state = initialState, action) {
         role: null,
         isAuthenticated: false,
         isAuthenticating: false,
+        isValidating: false,
         errorText: `${action.errorText}`,
         successText: null
       });
@@ -69,6 +79,7 @@ export function auth (state = initialState, action) {
         role: null,
         isAuthenticated: false,
         isAuthenticating: false,
+        isValidating: false,
         errorText: null,
         successText: null
       });
@@ -81,6 +92,7 @@ export function auth (state = initialState, action) {
         email: null,
         role: null,
         isAuthenticated: false,
+        isValidating: false,
         errorText: null,
         successText: 'You have been successfully logged out.'
       });
