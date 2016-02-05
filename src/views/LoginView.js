@@ -2,7 +2,6 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { routeActions } from 'react-router-redux';
 import { loginUser } from '../redux/actions/authentication';
-import classes from '../styles/_stylesheet.scss';
 import PageLoading from '../components/PageLoading';
 
 const LoginView = React.createClass({
@@ -58,7 +57,7 @@ const LoginView = React.createClass({
   render () {
 
     // If validating, dont show login view
-    if (this.props.isValidating) {
+    if (this.props.isLoading) {
       return this._getLoadingView();
     }
 
@@ -84,7 +83,7 @@ const LoginView = React.createClass({
               ref='password'
               placeholder='Enter password' /></p>
             <p><button
-              className='btn btn-success'
+              className='btn btn-success test-btn'
               disabled={this.props.isAuthenticating}
               onClick={this._login}>Login</button></p>
         </div>
@@ -96,7 +95,7 @@ const LoginView = React.createClass({
 const mapStateToProps = (state) => ({
   isAuthenticated: state.auth.isAuthenticated,
   isAuthenticating: state.auth.isAuthenticating,
-  isValidating: state.auth.isValidating,
+  isLoading: state.auth.isLoading,
   errorText: state.auth.errorText
 });
 

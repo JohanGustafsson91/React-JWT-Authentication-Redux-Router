@@ -19,7 +19,7 @@ const initialState = {
   role: null,
   isAuthenticated: false,
   isAuthenticating: false,
-  isValidating: false,
+  isLoading: false,
   errorText: null,
   successText: null
 };
@@ -38,7 +38,7 @@ export function auth (state = initialState, action) {
 
     case AUTHORIZE_USER_REQUEST:
       return Object.assign({}, state, {
-        isValidating: true,
+        isLoading: true,
         errorText: null
       });
 
@@ -51,7 +51,7 @@ export function auth (state = initialState, action) {
         role: action.user.role,
         isAuthenticated: true,
         isAuthenticating: false,
-        isValidating: false,
+        isLoading: false,
         errorText: null,
         successText: 'You have been successfully logged in.'
       });
@@ -65,7 +65,7 @@ export function auth (state = initialState, action) {
         role: null,
         isAuthenticated: false,
         isAuthenticating: false,
-        isValidating: false,
+        isLoading: false,
         errorText: `${action.errorText}`,
         successText: null
       });
@@ -79,7 +79,7 @@ export function auth (state = initialState, action) {
         role: null,
         isAuthenticated: false,
         isAuthenticating: false,
-        isValidating: false,
+        isLoading: false,
         errorText: null,
         successText: null
       });
@@ -92,7 +92,7 @@ export function auth (state = initialState, action) {
         email: null,
         role: null,
         isAuthenticated: false,
-        isValidating: false,
+        isLoading: false,
         errorText: null,
         successText: 'You have been successfully logged out.'
       });
