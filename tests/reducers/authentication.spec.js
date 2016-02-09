@@ -8,7 +8,6 @@ describe('Authentication Reducer', () => {
       auth(undefined, {})
     ).to.deep.equal(
       {
-        token: null,
         id: null,
         name: null,
         email: null,
@@ -54,7 +53,6 @@ describe('Authentication Reducer', () => {
         errorText: null
       })).to.deep.equal(
         {
-          token: null,
           id: null,
           name: null,
           email: null,
@@ -81,11 +79,9 @@ describe('Authentication Reducer', () => {
     expect(
       auth({}, {
         type: actions.LOGIN_USER_SUCCESS,
-        token: 'testtoken',
         user: response.user
       })).to.deep.equal(
         {
-          token: 'testtoken',
           id: 'testid',
           name: 'testname',
           email: 'testemail',
@@ -109,7 +105,6 @@ describe('Authentication Reducer', () => {
         errorText: response.errorText
       })).to.deep.equal(
         {
-          token: null,
           id: null,
           name: null,
           email: null,
@@ -129,7 +124,6 @@ describe('Authentication Reducer', () => {
         type: actions.UNAUTHORIZED_USER_FAILURE
       })).to.deep.equal(
         {
-          token: null,
           id: null,
           name: null,
           email: null,
@@ -149,7 +143,6 @@ describe('Authentication Reducer', () => {
         type: actions.LOGOUT_USER
       })).to.deep.equal(
         {
-          token: null,
           id: null,
           name: null,
           email: null,

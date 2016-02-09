@@ -1,9 +1,16 @@
 /**
 * Authentication actions
+*
+* @todos:
+* - Put in correct and better order.
+* - Comment some and refactor?
 */
 
 import { routeActions } from 'react-router-redux';
 import { checkHttpStatus } from '../utils';
+
+import fetch from 'isomorphic-fetch';
+import 'es6-promise';
 
 // Constants
 export const LOGIN_USER_REQUEST = 'LOGIN_USER_REQUEST';
@@ -13,85 +20,32 @@ export const LOGOUT_USER = 'LOGOUT_USER';
 export const LOGIN_USER_FAILURE = 'LOGIN_USER_FAILURE';
 export const UNAUTHORIZED_USER_FAILURE = 'UNAUTHORIZED_USER_FAILURE';
 export const REFRESH_TOKEN = 'REFRESH_TOKEN';
+//export const BASE_API_URL = 'http://85.225.169.221:8080';
 export const BASE_API_URL = 'http://localhost:8080';
 
-export function loginUserRequest () {
-  return {
-    type: LOGIN_USER_REQUEST
-  };
-}
 
 /**
- * When refreshing, hide login page and show
- * spinner etc.
+ * @param  {[string]}   username
+ * @param  {[string]}   password
+ * @param  {[boolean]}  remember
+ * @param  {[string]}   redirect [Redirect to page after success]
+ *
+ * @author Johan Gustafsson <johan.gustafsson@solidio.se>
  */
-export function authorizeUserRequest () {
-  return {
-    type: AUTHORIZE_USER_REQUEST
-  };
-}
-
-export function loginUserSuccess (response) {
-  localStorage.setItem('token', response.token);
-
-  return {
-    type: LOGIN_USER_SUCCESS,
-    token: response.token,
-    user: response.user
-  };
-}
-
-/**
- * Gets called when there is a bigger error
- * like when the api cant be found and so on.
- */
-export function getServerFailure (type) {
-  return {
-    type: type,
-    status: 404,
-    errorText: 'Something went wrong...'
-  };
-}
-
-export function loginUserFailure (error) {
-  localStorage.removeItem('token');
-  try {
-    return {
-      type: LOGIN_USER_FAILURE,
-      status: error.response.status,
-      errorText: 'Wrong username or password'
-    };
-  } catch (e) {
-    return getServerFailure(LOGIN_USER_FAILURE);
-  }
-}
-
-export function unauthorizedUserFailure (error) {
-  localStorage.removeItem('token');
-  try {
-    return {
-      type: UNAUTHORIZED_USER_FAILURE,
-    };
-  } catch (e) {
-    return getServerFailure(UNAUTHORIZED_USER_FAILURE);
-  }
-}
-
 export function loginUser (username, password, redirect = '/') {
   return dispatch => {
     dispatch(loginUserRequest());
     return fetch(BASE_API_URL + '/session', {
       method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({email: username, password: password})
+      headers: getHeaders(),
+      body: JSON.stringify({
+        email: username,
+        password: password
+      })
     })
     .then(checkHttpStatus)
     .then(req => req.json())
     .then(response => {
-      console.log(response);
       try {
         dispatch(loginUserSuccess(response));
         dispatch(routeActions.push(redirect));
@@ -110,21 +64,48 @@ export function loginUser (username, password, redirect = '/') {
   };
 }
 
-export function validateUserToken (token, redirect = '/') {
+
+/**
+ * @author Johan Gustafsson <johan.gustafsson@solidio.se>
+ */
+export function loginUserRequest () {
+  return {
+    type: LOGIN_USER_REQUEST
+  };
+}
+
+
+/**
+ * @param  {[object]} response [user and token credentials]
+ *
+ * @author Johan Gustafsson <johan.gustafsson@solidio.se>
+ */
+export function loginUserSuccess (response) {
+  updateAuthenticationCredentials(response);
+  return {
+    type: LOGIN_USER_SUCCESS,
+    user: response.user
+  };
+}
+
+
+/**
+ * Refresh token on page load.
+ *
+ * @param  {[string]} redirect  [url after success]
+ *
+ * @author Johan Gustafsson <johan.gustafsson@solidio.se>
+ */
+export function validateUserToken (redirect = '/') {
   return dispatch => {
     dispatch(authorizeUserRequest());
     return fetch(BASE_API_URL + '/session/refresh', {
       method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'x-access-token': token
-      }
+      headers: getHeaders(),
     })
     .then(checkHttpStatus)
     .then(req => req.json())
     .then(response => {
-      console.log(response);
       try {
         dispatch(loginUserSuccess(response));
         dispatch(routeActions.push(redirect));
@@ -143,16 +124,132 @@ export function validateUserToken (token, redirect = '/') {
   };
 }
 
-export function logout () {
-  localStorage.removeItem('token');
+
+/**
+ * Used to show page loading instead of locking
+ * the login form when refreshing token.
+ *
+ * @author Johan Gustafsson <johan.gustafsson@solidio.se>
+ */
+export function authorizeUserRequest () {
   return {
-    type: LOGOUT_USER
+    type: AUTHORIZE_USER_REQUEST
   };
 }
 
+
+/**
+ * @param  {[object]} error [from API response]
+ *
+ * @author Johan Gustafsson <johan.gustafsson@solidio.se>
+ */
+export function loginUserFailure (error) {
+  localStorage.removeItem('auth');
+  try {
+    return {
+      type: LOGIN_USER_FAILURE,
+      status: error.response.status,
+      errorText: 'Wrong username or password'
+    };
+  } catch (e) {
+    // Catch if error.response.status isn't given
+    return getServerFailure(LOGIN_USER_FAILURE);
+  }
+}
+
+
+/**
+ * @param  {[object]} error [from API response]
+ *
+ * @author Johan Gustafsson <johan.gustafsson@solidio.se>
+ */
+export function unauthorizedUserFailure (error) {
+  localStorage.removeItem('auth');
+  try {
+    return {
+      type: UNAUTHORIZED_USER_FAILURE,
+    };
+  } catch (e) {
+    // Catch if error.response.status isn't given
+    return getServerFailure(UNAUTHORIZED_USER_FAILURE);
+  }
+}
+
+
+/**
+ * Gets called when there is a bigger error
+ * like when the api cant be found and so on.
+ *
+ * @param  {[constant]} type [action type that called this function]
+ *
+ * @author Johan Gustafsson <johan.gustafsson@solidio.se>
+ */
+export function getServerFailure (type) {
+  return {
+    type: type,
+    status: 404,
+    errorText: 'Something went wrong...'
+  };
+}
+
+
+/**
+ * @param  {[object]} credentials
+ *
+ * @todo Check if not given but called
+ *
+ * @author Johan Gustafsson <johan.gustafsson@solidio.se>
+ */
+export function updateAuthenticationCredentials (credentials) {
+  if (credentials.auth) {
+    localStorage.setItem('auth', JSON.stringify({
+      token: credentials.auth.token
+    }));
+  }
+}
+
+
+/**
+ * @author Johan Gustafsson <johan.gustafsson@solidio.se>
+ */
+export function getHeaders () {
+  try {
+    let auth = JSON.parse(localStorage.getItem('auth'));
+    if (auth !== null) {
+      return {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'x-access-token': auth.token || null
+      };
+    }
+  } catch (e) {}
+
+  // Return without access credentials if not saved in local storage.
+  return {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+  };
+}
+
+
+/**
+ * @author Johan Gustafsson <johan.gustafsson@solidio.se>
+ */
 export function logoutAndRedirect () {
   return (dispatch, state) => {
     dispatch(logout());
     dispatch(routeActions.push('/login'));
+  };
+}
+
+
+/**
+ * @author Johan Gustafsson <johan.gustafsson@solidio.se>
+ * @todo Send API request
+ */
+export function logout () {
+  localStorage.removeItem('auth');
+  return {
+    type: LOGOUT_USER
   };
 }

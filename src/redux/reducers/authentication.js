@@ -12,7 +12,6 @@ import {
 * information.
 */
 const initialState = {
-  token: null,
   id: null,
   name: null,
   email: null,
@@ -44,7 +43,6 @@ export function auth (state = initialState, action) {
 
     case LOGIN_USER_SUCCESS:
       return Object.assign({}, state, {
-        token: action.token,
         id: action.user.id,
         name: action.user.name,
         email: action.user.email,
@@ -58,7 +56,6 @@ export function auth (state = initialState, action) {
 
     case LOGIN_USER_FAILURE:
       return Object.assign({}, state, {
-        token: null,
         id: null,
         name: null,
         email: null,
@@ -72,7 +69,6 @@ export function auth (state = initialState, action) {
 
     case UNAUTHORIZED_USER_FAILURE:
       return Object.assign({}, state, {
-        token: null,
         id: null,
         name: null,
         email: null,
@@ -86,7 +82,6 @@ export function auth (state = initialState, action) {
 
     case LOGOUT_USER:
       return Object.assign({}, state, {
-        token: null,
         id: null,
         name: null,
         email: null,

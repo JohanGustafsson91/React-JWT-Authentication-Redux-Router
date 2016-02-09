@@ -16,9 +16,8 @@ const store = configureStore({ initialState, history });
 /**
  * Check if token is set and validate it
  */
-let token = localStorage.getItem('token');
-if (token !== null) {
-    store.dispatch(validateUserToken(token, '/login'));
+if (localStorage.getItem('auth') !== null) {
+    store.dispatch(validateUserToken('/login'));
 }
 
 // Render the React application to the DOM
