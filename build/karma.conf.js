@@ -30,7 +30,10 @@ const karmaConfig = {
     module: {
       loaders: webpackConfig.module.loaders
     },
-    sassLoader: webpackConfig.sassLoader
+    sassLoader: webpackConfig.sassLoader,
+    node: {
+      fs: 'empty'
+    }
   },
   webpackMiddleware: {
     noInfo: true

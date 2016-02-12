@@ -2,6 +2,7 @@ import * as actions from 'redux/actions/authentication';
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import TestUtils from 'react-addons-test-utils';
+import { bindActionCreators } from 'redux';
 
 const middlewares = [ thunk ];
 const mockStore = configureMockStore(middlewares);
@@ -35,18 +36,22 @@ describe('Authentication Actions (sync)', () => {
   });
 
   it('Should create an action to show login user success', () => {
+
     const expectedAction = {
       type: actions.LOGIN_USER_SUCCESS,
       user: 'testuser'
     };
     const response = {
       auth: {
-        token: 'testtoken'
+        token: 'testtoken',
+        id: 'testid',
+        code: 'testcode'
       },
       user: 'testuser'
     };
 
-    expect(actions.loginUserSuccess(response)).to.deep.equal(expectedAction);
+    var bajs = actions.loginUserSuccess(response);
+    expect(bajs).to.deep.equal(expectedAction);
   });
 
   it('Should create an action to get a server failure', () => {
@@ -60,7 +65,9 @@ describe('Authentication Actions (sync)', () => {
 
   it('Should create an action to show unauthorized user failure', () => {
     const expectedAction = {
-      type: actions.UNAUTHORIZED_USER_FAILURE
+      type: actions.UNAUTHORIZED_USER_FAILURE,
+      status: 401,
+      errorText: 'unauthorized'
     };
     const error = {
         response: {
@@ -68,6 +75,21 @@ describe('Authentication Actions (sync)', () => {
         }
     };
     expect(actions.unauthorizedUserFailure(error)).to.deep.equal(expectedAction);
+    expect(_spies.removeCredentials).to.have.been.calledWith('auth');
+  });
+
+  it('Should create an action to show a login failure', () => {
+    const expectedAction = {
+      type: actions.LOGIN_USER_FAILURE,
+      status: 500,
+      errorText: 'Wrong username or password'
+    };
+    const error = {
+        response: {
+          status: 500,
+        }
+    };
+    expect(actions.loginUserFailure(error)).to.deep.equal(expectedAction);
     expect(_spies.removeCredentials).to.have.been.calledWith('auth');
   });
 
@@ -84,11 +106,15 @@ describe('Authentication Actions (sync)', () => {
     const expectedAction = {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'x-access-token': 'testtoken'
+        'x-access-token': 'testtoken',
+        'x-access-id': null,
+        'x-access-code': null
     };
 
     let getItem = sinon.stub(localStorage, 'getItem').returns(JSON.stringify({
-      token: 'testtoken'
+      token: 'testtoken',
+      id: '',
+      code: ''
     }));
 
     var test = actions.getHeaders();
@@ -112,7 +138,12 @@ describe('Authentication Actions (sync)', () => {
     localStorage.getItem.restore();
   });
 
-  it('Should update token after request if given', () => {
+  it('Should only update token when id and code arent given', () => {
+
+    let getItem = sinon.stub(localStorage, 'getItem').returns(JSON.stringify({
+      token: 'test',
+    }));
+
     let responseFromApi = {
       auth: {
         token: 'newToken'
@@ -124,16 +155,44 @@ describe('Authentication Actions (sync)', () => {
     };
 
     actions.updateAuthenticationCredentials(responseFromApi);
+    expect(getItem).to.have.been.calledWith('auth');
     expect(_spies.setItem).to.have.been.calledWith('auth', JSON.stringify(expectedAction));
   });
 
-  it('Should not update token after request when not given', () => {
+
+  it('Should update token, id and code after request if given', () => {
+
     let responseFromApi = {
-      auth: 'notCorrect'
+      auth: {
+        token: 'newToken',
+        id: 'newId',
+        code: 'newAuth'
+      }
     };
 
     let expectedAction = {
-      token: 'newToken'
+      token: 'newToken',
+      id: 'newId',
+      code: 'newAuth'
+    };
+
+    actions.updateAuthenticationCredentials(responseFromApi);
+    expect(_spies.setItem).to.have.been.calledWith('auth', JSON.stringify(expectedAction));
+  });
+
+  it('Should not update token, id and code after request when not given', () => {
+    let responseFromApi = {
+      no: {
+        token: 'newToken',
+        code: 'newAuth',
+        id: 'newId'
+      }
+    };
+
+    let expectedAction = {
+      token: 'newToken',
+      code: 'newAuth',
+      id: 'newId'
     };
 
     actions.updateAuthenticationCredentials(responseFromApi);

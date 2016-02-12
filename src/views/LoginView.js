@@ -6,6 +6,15 @@ import PageLoading from '../components/PageLoading';
 
 const LoginView = React.createClass({
 
+  /**
+  * Only for UI components
+  */
+  getInitialState() {
+    return {
+      remember: false
+    };
+  },
+
   componentWillMount () {
     this._redirectFromLogin();
   },
@@ -26,20 +35,16 @@ const LoginView = React.createClass({
     }
   },
 
-  /**
-  * Function that attempts to login a user.
-  */
   _login () {
     const username = this.refs.username.value;
     const password = this.refs.password.value;
+    const remember = this.state.remember;
     const redirectRoute = this.props.location.query.next || '/login';
-    this.props.dispatch(loginUser(username, password, redirectRoute));
+    this.props.dispatch(
+      loginUser(username, password, remember, redirectRoute)
+    );
   },
 
-  /**
-   * Return loading view
-   * @return {[type]} [description]
-   */
   _getLoadingView () {
     return (
       <PageLoading />
@@ -75,31 +80,43 @@ const LoginView = React.createClass({
                 disabled={this.props.isAuthenticating}
                 ref='password'
                 placeholder='Enter password' /></p>
-              <p><button
-                type="submit"
-                className='btn btn-success test-btn'
-                disabled={this.props.isAuthenticating}
-                onClick={this._login}>Login</button></p>
-          </div>
-        </div>
-      </form>
-    );
-  }
-});
+              <div className="checkbox">
+                <label>
+                  <input
+                    type="checkbox"
+                    ref="remember"
+                    value={this.state.remember}
+                    disabled={this.props.isAuthenticating}
+                    onChange={() => this.setState({
+                      remember: !this.state.checked
+                    })} /> Remember me
+                  </label>
+                </div>
+                <p><button
+                  type="submit"
+                  className='btn btn-success test-btn'
+                  disabled={this.props.isAuthenticating}
+                  onClick={this._login}>Login</button></p>
+              </div>
+            </div>
+          </form>
+        );
+      }
+    });
 
-LoginView.propTypes = {
-  isAuthenticated: PropTypes.bool.isRequired,
-  isAuthenticating: PropTypes.bool.isRequired,
-  dispatch: PropTypes.func.isRequired,
-  location: PropTypes.object.isRequired,
-  errorText: PropTypes.string
-};
+    LoginView.propTypes = {
+      isAuthenticated: PropTypes.bool.isRequired,
+      isAuthenticating: PropTypes.bool.isRequired,
+      dispatch: PropTypes.func.isRequired,
+      location: PropTypes.object.isRequired,
+      errorText: PropTypes.string
+    };
 
-const mapStateToProps = (state) => ({
-  isAuthenticated: state.auth.isAuthenticated,
-  isAuthenticating: state.auth.isAuthenticating,
-  isLoading: state.auth.isLoading,
-  errorText: state.auth.errorText
-});
+    const mapStateToProps = (state) => ({
+      isAuthenticated: state.auth.isAuthenticated,
+      isAuthenticating: state.auth.isAuthenticating,
+      isLoading: state.auth.isLoading,
+      errorText: state.auth.errorText
+    });
 
-export default connect(mapStateToProps)(LoginView);
+    export default connect(mapStateToProps)(LoginView);

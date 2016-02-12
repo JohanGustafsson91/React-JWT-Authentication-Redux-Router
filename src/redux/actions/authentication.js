@@ -20,9 +20,8 @@ export const LOGOUT_USER = 'LOGOUT_USER';
 export const LOGIN_USER_FAILURE = 'LOGIN_USER_FAILURE';
 export const UNAUTHORIZED_USER_FAILURE = 'UNAUTHORIZED_USER_FAILURE';
 export const REFRESH_TOKEN = 'REFRESH_TOKEN';
-//export const BASE_API_URL = 'http://85.225.169.221:8080';
-export const BASE_API_URL = 'http://localhost:8080';
-
+// export const BASE_API_URL = 'http://localhost:8080';
+export const BASE_API_URL = 'http://85.225.169.221:8080';
 
 /**
  * @param  {[string]}   username
@@ -32,7 +31,7 @@ export const BASE_API_URL = 'http://localhost:8080';
  *
  * @author Johan Gustafsson <johan.gustafsson@solidio.se>
  */
-export function loginUser (username, password, redirect = '/') {
+export function loginUser (username, password, remember, redirect = '/') {
   return dispatch => {
     dispatch(loginUserRequest());
     return fetch(BASE_API_URL + '/session', {
@@ -40,12 +39,14 @@ export function loginUser (username, password, redirect = '/') {
       headers: getHeaders(),
       body: JSON.stringify({
         email: username,
-        password: password
+        password: password,
+        remember: remember
       })
     })
     .then(checkHttpStatus)
     .then(req => req.json())
     .then(response => {
+      console.log(response);
       try {
         dispatch(loginUserSuccess(response));
         dispatch(routeActions.push(redirect));
@@ -64,7 +65,6 @@ export function loginUser (username, password, redirect = '/') {
   };
 }
 
-
 /**
  * @author Johan Gustafsson <johan.gustafsson@solidio.se>
  */
@@ -74,7 +74,6 @@ export function loginUserRequest () {
   };
 }
 
-
 /**
  * @param  {[object]} response [user and token credentials]
  *
@@ -82,12 +81,12 @@ export function loginUserRequest () {
  */
 export function loginUserSuccess (response) {
   updateAuthenticationCredentials(response);
+
   return {
     type: LOGIN_USER_SUCCESS,
     user: response.user
   };
 }
-
 
 /**
  * Refresh token on page load.
@@ -101,11 +100,12 @@ export function validateUserToken (redirect = '/') {
     dispatch(authorizeUserRequest());
     return fetch(BASE_API_URL + '/session/refresh', {
       method: 'POST',
-      headers: getHeaders(),
+      headers: getHeaders()
     })
     .then(checkHttpStatus)
     .then(req => req.json())
     .then(response => {
+      console.log(response);
       try {
         dispatch(loginUserSuccess(response));
         dispatch(routeActions.push(redirect));
@@ -124,7 +124,6 @@ export function validateUserToken (redirect = '/') {
   };
 }
 
-
 /**
  * Used to show page loading instead of locking
  * the login form when refreshing token.
@@ -136,7 +135,6 @@ export function authorizeUserRequest () {
     type: AUTHORIZE_USER_REQUEST
   };
 }
-
 
 /**
  * @param  {[object]} error [from API response]
@@ -157,7 +155,6 @@ export function loginUserFailure (error) {
   }
 }
 
-
 /**
  * @param  {[object]} error [from API response]
  *
@@ -168,13 +165,14 @@ export function unauthorizedUserFailure (error) {
   try {
     return {
       type: UNAUTHORIZED_USER_FAILURE,
+      status: error.response.status,
+      errorText: 'unauthorized'
     };
   } catch (e) {
     // Catch if error.response.status isn't given
     return getServerFailure(UNAUTHORIZED_USER_FAILURE);
   }
 }
-
 
 /**
  * Gets called when there is a bigger error
@@ -192,25 +190,37 @@ export function getServerFailure (type) {
   };
 }
 
-
 /**
  * @param  {[object]} credentials
  *
- * @todo Check if not given but called
- *
  * @author Johan Gustafsson <johan.gustafsson@solidio.se>
  */
-export function updateAuthenticationCredentials (credentials) {
-  if (credentials.auth) {
-    localStorage.setItem('auth', JSON.stringify({
-      token: credentials.auth.token
-    }));
+export function updateAuthenticationCredentials (response) {
+  if (response.hasOwnProperty('auth') && response.auth !== null) {
+    let credentials = {};
+    credentials.token = response.auth.token;
+
+    if (response.auth.hasOwnProperty('code') && response.auth.code !== null) {
+      console.log('Set new remember me keys');
+      credentials.id = response.auth.id;
+      credentials.code = response.auth.code;
+
+    } else {
+      let auth = JSON.parse(localStorage.getItem('auth'));
+      if (auth.hasOwnProperty('code') && auth.code !== null) {
+        console.log('Use current remember me keys');
+        credentials.id = auth.id;
+        credentials.code = auth.code;
+      }
+    }
+
+    localStorage.setItem('auth', JSON.stringify(credentials));
   }
 }
 
-
 /**
  * @author Johan Gustafsson <johan.gustafsson@solidio.se>
+ * @todo use .hasOwnProperty
  */
 export function getHeaders () {
   try {
@@ -219,7 +229,9 @@ export function getHeaders () {
       return {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'x-access-token': auth.token || null
+        'x-access-token': auth.token || null,
+        'x-access-id': auth.id || null,
+        'x-access-code': auth.code || null
       };
     }
   } catch (e) {}
@@ -227,28 +239,38 @@ export function getHeaders () {
   // Return without access credentials if not saved in local storage.
   return {
     'Accept': 'application/json',
-    'Content-Type': 'application/json',
+    'Content-Type': 'application/json'
   };
 }
-
 
 /**
  * @author Johan Gustafsson <johan.gustafsson@solidio.se>
  */
 export function logoutAndRedirect () {
-  return (dispatch, state) => {
-    dispatch(logout());
-    dispatch(routeActions.push('/login'));
+  return dispatch => {
+    return fetch(BASE_API_URL + '/session', {
+      method: 'DELETE',
+      headers: getHeaders()
+    })
+    .then(checkHttpStatus)
+    .then(req => req.json())
+    .then(response => {
+      dispatch(logout());
+      dispatch(routeActions.push('/login'));
+    })
+    .catch(error => {
+      dispatch(logout());
+      dispatch(routeActions.push('/login'));
+    });
   };
 }
 
-
 /**
  * @author Johan Gustafsson <johan.gustafsson@solidio.se>
- * @todo Send API request
  */
 export function logout () {
   localStorage.removeItem('auth');
+
   return {
     type: LOGOUT_USER
   };
