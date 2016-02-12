@@ -207,7 +207,7 @@ export function updateAuthenticationCredentials (response) {
 
     } else {
       let auth = JSON.parse(localStorage.getItem('auth'));
-      if (auth.hasOwnProperty('code') && auth.code !== null) {
+      if (auth !== null && auth.hasOwnProperty('code')) {
         console.log('Use current remember me keys');
         credentials.id = auth.id;
         credentials.code = auth.code;
