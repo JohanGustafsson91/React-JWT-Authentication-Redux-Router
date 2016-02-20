@@ -1,14 +1,11 @@
 /**
 * Authentication actions
-*
-* @todos:
-* - Put in correct and better order.
-* - Comment some and refactor?
 */
 
 import { routeActions } from 'react-router-redux';
 import { checkHttpStatus } from '../utils';
 
+// Fetch compability for all browsers
 import fetch from 'isomorphic-fetch';
 import 'es6-promise';
 
@@ -20,8 +17,7 @@ export const LOGOUT_USER = 'LOGOUT_USER';
 export const LOGIN_USER_FAILURE = 'LOGIN_USER_FAILURE';
 export const UNAUTHORIZED_USER_FAILURE = 'UNAUTHORIZED_USER_FAILURE';
 export const REFRESH_TOKEN = 'REFRESH_TOKEN';
-// export const BASE_API_URL = 'http://localhost:8080';
-export const BASE_API_URL = 'http://85.225.169.221:8080';
+export const BASE_API_URL = 'http://localhost:8080';
 
 /**
  * @param  {[string]}   username
@@ -51,6 +47,7 @@ export function loginUser (username, password, remember, redirect = '/') {
         dispatch(loginUserSuccess(response));
         dispatch(routeActions.push(redirect));
       } catch (e) {
+        console.error(e);
         dispatch(loginUserFailure({
           response: {
             status: 403,
@@ -60,6 +57,7 @@ export function loginUser (username, password, remember, redirect = '/') {
       }
     })
     .catch(error => {
+      console.error(error);
       dispatch(loginUserFailure(error));
     });
   };
@@ -110,6 +108,7 @@ export function validateUserToken (redirect = '/') {
         dispatch(loginUserSuccess(response));
         dispatch(routeActions.push(redirect));
       } catch (e) {
+        console.error(e);
         dispatch(unauthorizedUserFailure({
           response: {
             status: 403,
@@ -119,6 +118,7 @@ export function validateUserToken (redirect = '/') {
       }
     })
     .catch(error => {
+      console.error(error);
       dispatch(unauthorizedUserFailure(error));
     });
   };
@@ -147,7 +147,7 @@ export function loginUserFailure (error) {
     return {
       type: LOGIN_USER_FAILURE,
       status: error.response.status,
-      errorText: 'Wrong username or password'
+      errorText: 'Fel användarnamn eller lösenord'
     };
   } catch (e) {
     // Catch if error.response.status isn't given
@@ -186,7 +186,7 @@ export function getServerFailure (type) {
   return {
     type: type,
     status: 404,
-    errorText: 'Something went wrong...'
+    errorText: 'Någonting gick fel...'
   };
 }
 
@@ -196,19 +196,17 @@ export function getServerFailure (type) {
  * @author Johan Gustafsson <johan.gustafsson@solidio.se>
  */
 export function updateAuthenticationCredentials (response) {
-  if (response.hasOwnProperty('auth') && response.auth !== null) {
+  if (response.hasOwnProperty('auth')) {
     let credentials = {};
     credentials.token = response.auth.token;
 
-    if (response.auth.hasOwnProperty('code') && response.auth.code !== null) {
-      console.log('Set new remember me keys');
+    if (response.auth.hasOwnProperty('code')) {
       credentials.id = response.auth.id;
       credentials.code = response.auth.code;
 
     } else {
       let auth = JSON.parse(localStorage.getItem('auth'));
       if (auth !== null && auth.hasOwnProperty('code')) {
-        console.log('Use current remember me keys');
         credentials.id = auth.id;
         credentials.code = auth.code;
       }
@@ -259,6 +257,7 @@ export function logoutAndRedirect () {
       dispatch(routeActions.push('/login'));
     })
     .catch(error => {
+      console.error(error);
       dispatch(logout());
       dispatch(routeActions.push('/login'));
     });

@@ -29,19 +29,21 @@ const initialState = {
 export function auth (state = initialState, action) {
   switch (action.type) {
 
-    case LOGIN_USER_REQUEST:
+    case LOGIN_USER_REQUEST: {
       return Object.assign({}, state, {
         isAuthenticating: true,
         errorText: null
       });
+    }
 
-    case AUTHORIZE_USER_REQUEST:
+    case AUTHORIZE_USER_REQUEST: {
       return Object.assign({}, state, {
         isLoading: true,
         errorText: null
       });
+    }
 
-    case LOGIN_USER_SUCCESS:
+    case LOGIN_USER_SUCCESS: {
       return Object.assign({}, state, {
         id: action.user.id,
         name: action.user.name,
@@ -53,8 +55,9 @@ export function auth (state = initialState, action) {
         errorText: null,
         successText: 'You have been successfully logged in.'
       });
+    }
 
-    case LOGIN_USER_FAILURE:
+    case LOGIN_USER_FAILURE: {
       return Object.assign({}, state, {
         id: null,
         name: null,
@@ -66,8 +69,9 @@ export function auth (state = initialState, action) {
         errorText: `${action.errorText}`,
         successText: null
       });
+    }
 
-    case UNAUTHORIZED_USER_FAILURE:
+    case UNAUTHORIZED_USER_FAILURE: {
       return Object.assign({}, state, {
         id: null,
         name: null,
@@ -79,8 +83,9 @@ export function auth (state = initialState, action) {
         errorText: null,
         successText: null
       });
+    }
 
-    case LOGOUT_USER:
+    case LOGOUT_USER: {
       return Object.assign({}, state, {
         id: null,
         name: null,
@@ -91,8 +96,10 @@ export function auth (state = initialState, action) {
         errorText: null,
         successText: 'You have been successfully logged out.'
       });
+    }
 
-    default:
+    default: {
       return state;
+    }
   }
 }

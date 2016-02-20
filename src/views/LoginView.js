@@ -30,7 +30,7 @@ const LoginView = React.createClass({
   _redirectFromLogin () {
     if (this.props.isAuthenticated) {
       this.props.dispatch(
-        routeActions.push('/profile')
+        routeActions.push(this.props.location.query.next || '/profile')
       );
     }
   },
