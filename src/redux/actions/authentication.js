@@ -1,5 +1,6 @@
 /**
 * Authentication actions
+*
 */
 
 import { routeActions } from 'react-router-redux';
@@ -147,7 +148,7 @@ export function loginUserFailure (error) {
     return {
       type: LOGIN_USER_FAILURE,
       status: error.response.status,
-      errorText: 'Fel användarnamn eller lösenord'
+      errorText: 'Wrong username or password'
     };
   } catch (e) {
     // Catch if error.response.status isn't given
@@ -186,7 +187,7 @@ export function getServerFailure (type) {
   return {
     type: type,
     status: 404,
-    errorText: 'Någonting gick fel...'
+    errorText: 'Something went wrong...'
   };
 }
 

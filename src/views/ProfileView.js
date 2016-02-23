@@ -5,7 +5,7 @@ const ProfileView = React.createClass({
     return (
       <div>
         <h1>Profile</h1>
-        <p><i>This view is protected</i></p>
+        <p><i className="fa fa-lock"></i> This view is protected</p>
       </div>
     );
   }

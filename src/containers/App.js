@@ -2,14 +2,65 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import {Link} from 'react-router';
 import {logoutAndRedirect} from '../redux/actions/authentication';
+import '../../node_modules/font-awesome/scss/font-awesome.scss';
+import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
+import '../styles/_stylesheet.scss';
 
 const App = React.createClass({
 
-  propTypes: {
-    isAuthenticated: PropTypes.bool,
-    name: PropTypes.string,
-    dispatch: PropTypes.func,
-    children: PropTypes.object
+  getInitialState () {
+    return {
+      showMenu: false
+    };
+  },
+
+  componentDidUpdate(prevProps, prevState) {
+    // Close menu on new page if last state was opened
+    if (prevState.showMenu) {
+      this.setState({
+        showMenu: false
+      });
+    }
+  },
+
+  _getNavBar () {
+    return (
+      <nav className='navbar navbar-default'>
+        <div className='container'>
+          <div className='navbar-header'>
+
+            {/* Menu button */}
+            <button
+              className='navbar-toggle'
+              onClick={() => this.setState({
+                showMenu: !this.state.showMenu
+              })}>
+              <i className='fa fa-bars'></i>
+            </button>
+
+            {/* Menu text to left */}
+            <a className='navbar-brand' href='#'>
+              {
+                this.props.isAuthenticated ?
+                'Welcome ' + this.props.name + '!' :
+                'Welcome guest!'
+              }
+            </a>
+          </div>
+
+          <div
+            className={this.state.showMenu ?
+              'navbar-collapse' :
+              'collapse navbar-collapse'} >
+            {
+              this.props.isAuthenticated ?
+              this._getAuthenticatedNavbarItems() :
+              this._getGuestNavbarItems()
+            }
+          </div>
+        </div>
+      </nav>
+    );
   },
 
   /**
@@ -19,9 +70,10 @@ const App = React.createClass({
   *       different navbar with permissions.
   * @return {[navbar]}
   */
-  _getAuthenticatedNavbar () {
+  _getAuthenticatedNavbarItems () {
     return (
       <ul className='nav navbar-nav navbar-right'>
+        <li><Link to='/'>Home</Link></li>
         <li><Link to='/profile'>Profile</Link></li>
         <li>
           <a href='#'
@@ -38,7 +90,7 @@ const App = React.createClass({
   * Function that returns the guest navbar items.
   * @return {[navbar]}
   */
-  _getGuestNavbar () {
+  _getGuestNavbarItems () {
     return (
       <ul className='nav navbar-nav navbar-right'>
         <li><Link to='/'>Home</Link></li>
@@ -50,25 +102,9 @@ const App = React.createClass({
   render () {
     return (
       <div>
-        <nav className='navbar navbar-default'>
-          <div className='container'>
-            <div className='navbar-header'>
-              <Link className='navbar-brand' to='/'>
-                {
-                  this.props.isAuthenticated ?
-                  'Welcome ' + this.props.name + '!' : 'Welcome guest'
-                }
-              </Link>
-            </div>
-            <div id='navbar'>
-              {
-                this.props.isAuthenticated ?
-                this._getAuthenticatedNavbar() :
-                this._getGuestNavbar()
-              }
-            </div>
-          </div>
-        </nav>
+        {
+          this._getNavBar()
+        }
         <div className='container'>
           <div className='row'>
             <div className='col-xs-12'>
@@ -80,6 +116,13 @@ const App = React.createClass({
     );
   }
 });
+
+App.propTypes = {
+  isAuthenticated: PropTypes.bool,
+  name: PropTypes.string,
+  dispatch: PropTypes.func,
+  children: PropTypes.object
+};
 
 const mapStateToProps = (state) => ({
   isAuthenticated: state.auth.isAuthenticated,

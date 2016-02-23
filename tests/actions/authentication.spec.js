@@ -50,8 +50,8 @@ describe('Authentication Actions (sync)', () => {
       user: 'testuser'
     };
 
-    var bajs = actions.loginUserSuccess(response);
-    expect(bajs).to.deep.equal(expectedAction);
+    var test = actions.loginUserSuccess(response);
+    expect(test).to.deep.equal(expectedAction);
   });
 
   it('Should create an action to get a server failure', () => {
@@ -60,7 +60,9 @@ describe('Authentication Actions (sync)', () => {
       status: 404,
       errorText: 'Something went wrong...'
     };
-    expect(actions.getServerFailure(actions.UNAUTHORIZED_USER_FAILURE)).to.deep.equal(expectedAction);
+    expect(
+      actions.getServerFailure(actions.UNAUTHORIZED_USER_FAILURE)
+    ).to.deep.equal(expectedAction);
   });
 
   it('Should create an action to show unauthorized user failure', () => {
