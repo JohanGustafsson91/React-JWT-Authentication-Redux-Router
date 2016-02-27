@@ -1,101 +1,101 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import {Link} from 'react-router';
-import {logoutAndRedirect} from '../redux/actions/authentication';
+import { routeActions } from 'react-router-redux';
+import { logoutAndRedirect } from '../redux/actions/authentication';
 import '../../node_modules/font-awesome/scss/font-awesome.scss';
 import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import '../styles/_stylesheet.scss';
+import Menu from '../components/menu/Menu';
 
 const App = React.createClass({
 
+  /**
+   * Specify the different types of menu items
+   * for the application in the initial state.
+   *
+   * @author Johan Gustafsson <johan.gustafsson@solidio.se>
+   */
   getInitialState () {
     return {
-      showMenu: false
+      guestMenuItems: [
+        {name: 'Home', handler: this._redirectTo, url: '/'},
+        {name: 'Login', handler: this._redirectTo, url: '/login'},
+      ],
+      authMenuItems: [
+        {name: 'Home', handler: this._redirectTo, url: '/'},
+        {name: 'Profile', handler: this._redirectTo, url: '/profile'},
+        {name: 'Logout', handler: this._logout, url: null}
+      ]
     };
   },
 
-  componentDidUpdate(prevProps, prevState) {
-    // Close menu on new page if last state was opened
-    if (prevState.showMenu) {
-      this.setState({
-        showMenu: false
-      });
+  /**
+   * @return {[Menu]} [Correct menu]
+   * @author Johan Gustafsson <johan.gustafsson@solidio.se>
+   */
+  _getMenu () {
+
+    // Get specifik menu options
+    let menuItems = this._getMenuItems();
+    let menuBrand = this._getMenuBrand();
+
+    return (
+      <Menu
+        menuItems={menuItems}
+        menuBrand={menuBrand} />
+    );
+  },
+
+  /**
+   * @return {[array]} [Array with correct menu items for menu]
+   * @author Johan Gustafsson <johan.gustafsson@solidio.se>
+   */
+  _getMenuItems () {
+    if (this.props.isAuthenticated) {
+      return this.state.authMenuItems;
+
+    } else {
+      return this.state.guestMenuItems;
     }
   },
 
-  _getNavBar () {
-    return (
-      <nav className='navbar navbar-default'>
-        <div className='container'>
-          <div className='navbar-header'>
+  /**
+   * @return {[object]} [Menu brand]
+   * @author Johan Gustafsson <johan.gustafsson@solidio.se>
+   */
+  _getMenuBrand () {
+    if (this.props.isAuthenticated) {
+      return {
+        name: 'Welcome ' + this.props.name,
+        handler: this._redirectTo,
+        url: '/profile'
+      };
 
-            {/* Menu button */}
-            <button
-              className='navbar-toggle'
-              onClick={() => this.setState({
-                showMenu: !this.state.showMenu
-              })}>
-              <i className='fa fa-bars'></i>
-            </button>
+    } else {
+      return {
+        name: 'Welcome guest',
+        handler: this._redirectTo,
+        url: '/'
+      };
+    }
+  },
 
-            {/* Menu text to left */}
-            <a className='navbar-brand' href='#'>
-              {
-                this.props.isAuthenticated ?
-                'Welcome ' + this.props.name + '!' :
-                'Welcome guest!'
-              }
-            </a>
-          </div>
-
-          <div
-            className={this.state.showMenu ?
-              'navbar-collapse' :
-              'collapse navbar-collapse'} >
-            {
-              this.props.isAuthenticated ?
-              this._getAuthenticatedNavbarItems() :
-              this._getGuestNavbarItems()
-            }
-          </div>
-        </div>
-      </nav>
+  /**
+   * @param  {[string]} url [the new url]
+   * @author Johan Gustafsson <johan.gustafsson@solidio.se>
+   */
+  _redirectTo (url) {
+    this.props.dispatch(
+      routeActions.push(url)
     );
   },
 
   /**
-  * Function that returns the navbar for an
-  * authenticated user.
-  * @todo We can use roles here and return a
-  *       different navbar with permissions.
-  * @return {[navbar]}
-  */
-  _getAuthenticatedNavbarItems () {
-    return (
-      <ul className='nav navbar-nav navbar-right'>
-        <li><Link to='/'>Home</Link></li>
-        <li><Link to='/profile'>Profile</Link></li>
-        <li>
-          <a href='#'
-            onClick={() => this.props.dispatch(
-              logoutAndRedirect()
-            )}>Logout
-          </a>
-        </li>
-      </ul>
-    );
-  },
-
-  /**
-  * Function that returns the guest navbar items.
-  * @return {[navbar]}
-  */
-  _getGuestNavbarItems () {
-    return (
-      <ul className='nav navbar-nav navbar-right'>
-        <li><Link to='/'>Home</Link></li>
-        <li><Link to='/login'>Login</Link></li>
-      </ul>
+   * @author Johan Gustafsson <johan.gustafsson@solidio.se>
+   */
+  _logout () {
+    this.props.dispatch(
+      logoutAndRedirect()
     );
   },
 
@@ -103,7 +103,7 @@ const App = React.createClass({
     return (
       <div>
         {
-          this._getNavBar()
+          this._getMenu()
         }
         <div className='container'>
           <div className='row'>
