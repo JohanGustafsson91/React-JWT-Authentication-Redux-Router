@@ -3,14 +3,28 @@ import { connect } from 'react-redux';
 import { routeActions } from 'react-router-redux';
 import { loginUser } from '../redux/actions/authentication';
 import PageLoading from '../components/PageLoading';
+import Button from '../components/general-components/Button';
+import CheckBox from '../components/general-components/CheckBox';
+import TextInput from '../components/general-components/TextInput';
 
 const LoginView = React.createClass({
+
+  propTypes: {
+    isAuthenticated: PropTypes.bool.isRequired,
+    isAuthenticating: PropTypes.bool.isRequired,
+    isLoading: PropTypes.bool.isRequired,
+    dispatch: PropTypes.func.isRequired,
+    location: PropTypes.object.isRequired,
+    errorText: PropTypes.string
+  },
 
   /**
   * Only for UI components
   */
-  getInitialState() {
+  getInitialState () {
     return {
+      username: '',
+      password: '',
       remember: false
     };
   },
@@ -24,9 +38,9 @@ const LoginView = React.createClass({
   },
 
   /**
-  * Function that redirects the user from
-  * login page if already logged in.
-  */
+   * Redirect user from login page if already logged in.
+   * @author Johan Gustafsson <johan.gustafsson@solidio.se>
+   */
   _redirectFromLogin () {
     if (this.props.isAuthenticated) {
       this.props.dispatch(
@@ -35,16 +49,24 @@ const LoginView = React.createClass({
     }
   },
 
+  /**
+   * @author Johan Gustafsson <johan.gustafsson@solidio.se>
+   */
   _login () {
-    const username = this.refs.username.value;
-    const password = this.refs.password.value;
+    const username = this.state.username;
+    const password = this.state.password;
     const remember = this.state.remember;
     const redirectRoute = this.props.location.query.next || '/login';
+
     this.props.dispatch(
       loginUser(username, password, remember, redirectRoute)
     );
   },
 
+  /**
+   * @return {[component]} [PageLoading]
+   * @author Johan Gustafsson <johan.gustafsson@solidio.se>
+   */
   _getLoadingView () {
     return (
       <PageLoading />
@@ -52,71 +74,84 @@ const LoginView = React.createClass({
   },
 
   render () {
-
     // If validating, dont show login view
     if (this.props.isLoading) {
       return this._getLoadingView();
     }
 
+    // Login error message
+    let errorMessage = this.props.errorText ?
+    <p className="text-danger">{this.props.errorText}</p> : '';
+
     return (
-      <form>
-        <div className='row'>
-          <div className='col-sm-4 col-sm-offset-4'>
-            <h1>Login</h1>
-            {
-              this.props.errorText ?
-              <p className='text-danger'>{this.props.errorText}</p> : ''
-              }
-              <p><input
-                type='text'
-                className='form-control'
-                defaultValue='admin@admin.com'
+      <div className="row">
+        <div className="col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4">
+          <h1>Login</h1>
+          {errorMessage}
+
+          <div className="row" style={{marginTop: '15px'}}>
+            <div className="col-xs-12">
+              <TextInput
+                type="text"
+                className="form-control"
                 disabled={this.props.isAuthenticating}
-                ref='username'
-                placeholder='Enter username' /></p>
-              <p><input
-                type='password'
-                className='form-control'
-                disabled={this.props.isAuthenticating}
-                ref='password'
-                placeholder='Enter password' /></p>
-              <div className="checkbox">
-                <label>
-                  <input
-                    type="checkbox"
-                    ref="remember"
-                    value={this.state.remember}
-                    disabled={this.props.isAuthenticating}
-                    onChange={() => this.setState({
-                      remember: !this.state.checked
-                    })} /> Remember me
-                  </label>
-                </div>
-                <p><button
-                  type="submit"
-                  className='btn btn-success test-btn'
-                  disabled={this.props.isAuthenticating}
-                  onClick={this._login}>Login</button></p>
-              </div>
+                placeholder="Enter username"
+                value={this.state.username}
+                onChange={(e) => {
+                  this.setState({
+                    username: e.target.value
+                  });
+                }} />
             </div>
-          </form>
-        );
-      }
-    });
+          </div>
 
-    LoginView.propTypes = {
-      isAuthenticated: PropTypes.bool.isRequired,
-      isAuthenticating: PropTypes.bool.isRequired,
-      dispatch: PropTypes.func.isRequired,
-      location: PropTypes.object.isRequired,
-      errorText: PropTypes.string
-    };
+          <div className="row" style={{marginTop: '15px'}}>
+            <div className="col-xs-12">
+              <TextInput
+                type="password"
+                className="form-control"
+                disabled={this.props.isAuthenticating}
+                placeholder="Enter password"
+                value={this.state.password}
+                onChange={(e) => {
+                  this.setState({
+                    password: e.target.value
+                  });
+                }} />
+            </div>
+          </div>
 
-    const mapStateToProps = (state) => ({
-      isAuthenticated: state.auth.isAuthenticated,
-      isAuthenticating: state.auth.isAuthenticating,
-      isLoading: state.auth.isLoading,
-      errorText: state.auth.errorText
-    });
+          <div className="row" style={{marginTop: '15px'}}>
+            <div className="col-xs-12 col-sm-6">
+              <CheckBox
+                text="Remember me"
+                checked={this.state.remember}
+                onClick={() => {
+                  this.setState({
+                    remember: !this.state.remember
+                  });
+                }} />
+            </div>
+            <div className="col-xs-12 col-sm-6 text-right">
+              <Button
+                text="Login"
+                baseStyle="btn btn-success"
+                onClick={this._login}
+                disabled={this.props.isAuthenticating} />
+            </div>
+          </div>
 
-    export default connect(mapStateToProps)(LoginView);
+        </div>
+      </div>
+    );
+  }
+});
+
+const mapStateToProps = (state) => ({
+  isAuthenticated: state.auth.isAuthenticated,
+  isAuthenticating: state.auth.isAuthenticating,
+  isLoading: state.auth.isLoading,
+  errorText: state.auth.errorText
+});
+
+export default connect(mapStateToProps)(LoginView);

@@ -6,6 +6,15 @@ import React, { PropTypes } from 'react';
  * @author Johan Gustafsson <johan.gustafsson@solidio.se>
  */
 const ToggleMenuButton = React.createClass({
+
+  propTypes: {
+    opened: PropTypes.bool.isRequired,
+    openedIcon: PropTypes.string.isRequired,
+    closedIcon: PropTypes.string.isRequired,
+    toggleMenu: PropTypes.func.isRequired,
+    className: PropTypes.string
+  },
+
   render () {
     return (
       <button
@@ -18,12 +27,5 @@ const ToggleMenuButton = React.createClass({
     );
   }
 });
-
-ToggleMenuButton.propTypes = {
-  opened: PropTypes.bool.isRequired,
-  openedIcon: PropTypes.string.isRequired,
-  closedIcon: PropTypes.string.isRequired,
-  toggleMenu: PropTypes.func.isRequired
-};
 
 export default ToggleMenuButton;

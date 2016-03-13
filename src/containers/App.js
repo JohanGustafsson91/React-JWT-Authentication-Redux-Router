@@ -9,6 +9,13 @@ import Menu from '../components/menu/Menu';
 
 const App = React.createClass({
 
+  propTypes: {
+    isAuthenticated: PropTypes.bool,
+    name: PropTypes.string,
+    dispatch: PropTypes.func,
+    children: PropTypes.object
+  },
+
   /**
    * Specify the different types of menu items
    * for the application in the initial state.
@@ -19,7 +26,7 @@ const App = React.createClass({
     return {
       guestMenuItems: [
         {name: 'Home', handler: this._redirectTo, url: '/'},
-        {name: 'Login', handler: this._redirectTo, url: '/login'},
+        {name: 'Login', handler: this._redirectTo, url: '/login'}
       ],
       authMenuItems: [
         {name: 'Home', handler: this._redirectTo, url: '/'},
@@ -34,7 +41,6 @@ const App = React.createClass({
    * @author Johan Gustafsson <johan.gustafsson@solidio.se>
    */
   _getMenu () {
-
     // Get specifik menu options
     let menuItems = this._getMenuItems();
     let menuBrand = this._getMenuBrand();
@@ -53,7 +59,6 @@ const App = React.createClass({
   _getMenuItems () {
     if (this.props.isAuthenticated) {
       return this.state.authMenuItems;
-
     } else {
       return this.state.guestMenuItems;
     }
@@ -70,7 +75,6 @@ const App = React.createClass({
         handler: this._redirectTo,
         url: '/profile'
       };
-
     } else {
       return {
         name: 'Welcome guest',
@@ -105,9 +109,9 @@ const App = React.createClass({
         {
           this._getMenu()
         }
-        <div className='container'>
-          <div className='row'>
-            <div className='col-xs-12'>
+        <div className="container">
+          <div className="row">
+            <div className="col-xs-12">
               {this.props.children}
             </div>
           </div>
@@ -116,13 +120,6 @@ const App = React.createClass({
     );
   }
 });
-
-App.propTypes = {
-  isAuthenticated: PropTypes.bool,
-  name: PropTypes.string,
-  dispatch: PropTypes.func,
-  children: PropTypes.object
-};
 
 const mapStateToProps = (state) => ({
   isAuthenticated: state.auth.isAuthenticated,

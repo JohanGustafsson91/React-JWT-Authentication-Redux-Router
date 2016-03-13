@@ -15,6 +15,9 @@
     "__BASENAME__" : false
   },
   "rules": {
-    "semi" : [2, "always"]
+    "semi" : [2, "always"],
+    "jsx-quotes": [2, "prefer-double"],
+    operator-linebreak: [2, "after", { "overrides": { "?": "ignore", ":": "ignore"} }],
+    "react/jsx-boolean-value": [2, "none"]
   }
 }

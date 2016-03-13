@@ -68,7 +68,10 @@
     "url": "^0.11.0",
     "yargs": "^3.18.0",
     "bootstrap": "^3.3.6",
-    "font-awesome": "^4.5.0"
+    "font-awesome": "^4.5.0",
+    "classnames": "^2.2.3",
+    "react-autosize-textarea": "^0.2.6",
+    "react-select": "^1.0.0-beta10"
   },
   "devDependencies": {
     "babel-core": "^6.3.17",

@@ -8,8 +8,8 @@ const HomeView = React.createClass({
         <h1>Welcome solid friend!</h1>
         <p>This is the authentication boilerplate
           with react, redux and react router.</p>
-        <p><Link to='/login'>Login</Link> to get access
-          to your <Link to='/profile'>profile</Link> page!</p>
+        <p><Link to="/login">Login</Link> to get access
+          to your <Link to="/profile">profile</Link> page!</p>
       </div>
     );
   }

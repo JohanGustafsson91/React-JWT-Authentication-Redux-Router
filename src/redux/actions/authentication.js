@@ -1,10 +1,11 @@
 /**
 * Authentication actions
-*
 */
 
 import { routeActions } from 'react-router-redux';
 import { checkHttpStatus } from '../utils';
+import * as LOG from '../utils/logging';
+import { messages } from '../utils/constants';
 
 // Fetch compability for all browsers
 import fetch from 'isomorphic-fetch';
@@ -43,12 +44,12 @@ export function loginUser (username, password, remember, redirect = '/') {
     .then(checkHttpStatus)
     .then(req => req.json())
     .then(response => {
-      console.log(response);
+      LOG.info(response);
       try {
         dispatch(loginUserSuccess(response));
         dispatch(routeActions.push(redirect));
       } catch (e) {
-        console.error(e);
+        LOG.error(e);
         dispatch(loginUserFailure({
           response: {
             status: 403,
@@ -58,7 +59,7 @@ export function loginUser (username, password, remember, redirect = '/') {
       }
     })
     .catch(error => {
-      console.error(error);
+      LOG.error(error);
       dispatch(loginUserFailure(error));
     });
   };
@@ -104,12 +105,12 @@ export function validateUserToken (redirect = '/') {
     .then(checkHttpStatus)
     .then(req => req.json())
     .then(response => {
-      console.log(response);
+      LOG.info(response);
       try {
         dispatch(loginUserSuccess(response));
         dispatch(routeActions.push(redirect));
       } catch (e) {
-        console.error(e);
+        LOG.error(e);
         dispatch(unauthorizedUserFailure({
           response: {
             status: 403,
@@ -119,7 +120,7 @@ export function validateUserToken (redirect = '/') {
       }
     })
     .catch(error => {
-      console.error(error);
+      LOG.error(error);
       dispatch(unauthorizedUserFailure(error));
     });
   };
@@ -148,7 +149,7 @@ export function loginUserFailure (error) {
     return {
       type: LOGIN_USER_FAILURE,
       status: error.response.status,
-      errorText: 'Wrong username or password'
+      errorText: messages.ERROR.LOGIN
     };
   } catch (e) {
     // Catch if error.response.status isn't given
@@ -187,7 +188,7 @@ export function getServerFailure (type) {
   return {
     type: type,
     status: 404,
-    errorText: 'Something went wrong...'
+    errorText: messages.ERROR.SERVER
   };
 }
 
@@ -202,10 +203,11 @@ export function updateAuthenticationCredentials (response) {
     credentials.token = response.auth.token;
 
     if (response.auth.hasOwnProperty('code')) {
+      // Update with new
       credentials.id = response.auth.id;
       credentials.code = response.auth.code;
-
     } else {
+      // Use current
       let auth = JSON.parse(localStorage.getItem('auth'));
       if (auth !== null && auth.hasOwnProperty('code')) {
         credentials.id = auth.id;
@@ -258,7 +260,7 @@ export function logoutAndRedirect () {
       dispatch(routeActions.push('/login'));
     })
     .catch(error => {
-      console.error(error);
+      LOG.error(error);
       dispatch(logout());
       dispatch(routeActions.push('/login'));
     });

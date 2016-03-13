@@ -5,6 +5,11 @@ import ToggleMenuButton from './ToggleMenuButton';
 
 const Menu = React.createClass({
 
+  propTypes: {
+    menuItems: PropTypes.array.isRequired,
+    menuBrand: PropTypes.object
+  },
+
   getInitialState () {
     return {
       showMenu: false
@@ -15,11 +20,9 @@ const Menu = React.createClass({
    * Close menu on new page if last state was opened.
    * @author Johan Gustafsson <johan.gustafsson@solidio.se>
    */
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.showMenu) {
-      this.setState({
-        showMenu: false
-      });
+  componentDidUpdate (prevProps, prevState) {
+    if (prevState.showMenu === true) {
+      this._toggleMenu();
     }
   },
 
@@ -33,11 +36,9 @@ const Menu = React.createClass({
   },
 
   render () {
-
     // Render menu items
     let idCounter = 0;
     let menuItems = this.props.menuItems.map((i) => {
-
       // Generate unique key for react
       let itemKey = 'menuItem_' + idCounter;
       idCounter += 1;
@@ -57,12 +58,12 @@ const Menu = React.createClass({
                     'collapse navbar-collapse';
 
     return (
-      <nav className='navbar navbar-default'>
-        <div className='container'>
-          <div className='navbar-header'>
+      <nav className="navbar navbar-default">
+        <div className="container">
+          <div className="navbar-header">
 
             <ToggleMenuButton
-              className='navbar-toggle'
+              className="navbar-toggle"
               opened={this.state.showMenu}
               toggleMenu={this._toggleMenu}
               openedIcon="fa fa-caret-square-o-up"
@@ -76,7 +77,7 @@ const Menu = React.createClass({
           </div>
 
           <div className={menuState}>
-              <ul className='nav navbar-nav navbar-right'>
+              <ul className="nav navbar-nav navbar-right">
                 {menuItems}
               </ul>
           </div>
@@ -86,10 +87,5 @@ const Menu = React.createClass({
     );
   }
 });
-
-Menu.propTypes = {
-  menuItems: PropTypes.array.isRequired,
-  menuBrand: PropTypes.object
-};
 
 export default Menu;

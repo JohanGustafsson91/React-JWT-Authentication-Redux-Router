@@ -6,11 +6,18 @@ import React, { PropTypes } from 'react';
  * @author Johan Gustafsson <johan.gustafsson@solidio.se>
  */
 const MenuBrand = React.createClass({
+
+  propTypes: {
+    handleClick: PropTypes.func.isRequired,
+    name: PropTypes.string.isRequired,
+    url: PropTypes.string
+  },
+
   render () {
     return (
       <a
         href="#"
-        className='navbar-brand'
+        className="navbar-brand"
         onClick={() => this.props.handleClick(
           this.props.url
         )}>
@@ -19,11 +26,5 @@ const MenuBrand = React.createClass({
     );
   }
 });
-
-MenuBrand.propTypes = {
-  handleClick: PropTypes.func.isRequired,
-  name: PropTypes.string.isRequired,
-  url: PropTypes.string
-};
 
 export default MenuBrand;

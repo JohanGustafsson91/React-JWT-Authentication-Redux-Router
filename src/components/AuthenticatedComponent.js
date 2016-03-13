@@ -5,6 +5,13 @@ import { routeActions } from 'react-router-redux';
 export function requireAuthentication (Component) {
   const AuthenticatedComponent = React.createClass({
 
+    propTypes: {
+      token: PropTypes.string,
+      isAuthenticated: PropTypes.bool,
+      location: PropTypes.object,
+      dispatch: PropTypes.func
+    },
+
     componentWillMount () {
       this._checkAuth();
     },
@@ -38,13 +45,6 @@ export function requireAuthentication (Component) {
       );
     }
   });
-
-  AuthenticatedComponent.propTypes = {
-    token: PropTypes.string,
-    isAuthenticated: PropTypes.bool,
-    location: PropTypes.object,
-    dispatch: PropTypes.func
-  };
 
   const mapStateToProps = (state) => ({
     token: state.auth.token,
