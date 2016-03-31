@@ -19,9 +19,12 @@
     "__BASENAME__" : false
   },
   "rules": {
-    "semi" : [2, "never"],
+    "semi" : [2, "always"],
     "max-len": [2, 120, 2],
     "flow-vars/define-flow-type": 1,
-    "flow-vars/use-flow-type": 1
+    "flow-vars/use-flow-type": 1,
+    "jsx-quotes": [2, "prefer-double"],
+    operator-linebreak: [2, "after", { "overrides": { "?": "ignore", ":": "ignore"} }],
+    "react/jsx-boolean-value": [2, "none"]
   }
 }
