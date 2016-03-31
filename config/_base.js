@@ -25,7 +25,7 @@ const config = {
   // ----------------------------------
   // Compiler Configuration
   // ----------------------------------
-  compiler_css_modules     : true,
+  compiler_css_modules     : false,
   compiler_devtool         : 'source-map',
   compiler_hash_type       : 'hash',
   compiler_fail_on_warning : false,
