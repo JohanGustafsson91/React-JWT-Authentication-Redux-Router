@@ -1,3 +1,5 @@
+import "babel-polyfill";
+
 import React, { PropTypes } from 'react';
 import '../../styles/core.scss';
 
