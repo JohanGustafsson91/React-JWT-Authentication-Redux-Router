@@ -40,26 +40,23 @@ export function loginUser (username, password, remember, redirect = '/') {
         password: password,
         remember: remember
       })
-    })
-    .then(checkHttpStatus)
-    .then(req => req.json())
-    .then(response => {
-      LOG.info(response);
-      try {
-        dispatch(loginUserSuccess(response));
-        dispatch(routeActions.push(redirect));
-      } catch (e) {
-        LOG.error(e);
+    }).then(response => {
+      if (response.status === 403) {
         dispatch(loginUserFailure({
           response: {
             status: 403,
             statusText: 'Invalid token'
           }
         }));
+      } else {
+        return response.json().then(function (json) {
+          dispatch(loginUserSuccess(json));
+          dispatch(routeActions.push(redirect));
+        });
       }
     })
     .catch(error => {
-      LOG.error(error);
+      console.error(error);
       dispatch(loginUserFailure(error));
     });
   };
