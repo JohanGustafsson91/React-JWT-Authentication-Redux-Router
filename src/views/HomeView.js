@@ -1,18 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router';
 
-const HomeView = React.createClass({
+class HomeView extends React.Component {
   render () {
     return (
       <div>
-        <h1>Welcome solid friend!</h1>
-        <p>This is the authentication boilerplate
-          with react, redux and react router.</p>
+        <h3>This is an authentication boilerplate
+          with react, redux and react router.</h3>
         <p><Link to="/login">Login</Link> to get access
           to your <Link to="/profile">profile</Link> page!</p>
       </div>
     );
   }
-});
+}
 
 export default HomeView;

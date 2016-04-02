@@ -19,7 +19,7 @@ export const LOGOUT_USER = 'LOGOUT_USER';
 export const LOGIN_USER_FAILURE = 'LOGIN_USER_FAILURE';
 export const UNAUTHORIZED_USER_FAILURE = 'UNAUTHORIZED_USER_FAILURE';
 export const REFRESH_TOKEN = 'REFRESH_TOKEN';
-export const BASE_API_URL = 'http://localhost:8080';
+export const BASE_API_URL = 'http://localhost:9000/api';
 
 /**
  * @param  {[string]}   username

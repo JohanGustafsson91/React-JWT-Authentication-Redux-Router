@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 
-const ProfileView = React.createClass({
+class ProfileView extends React.Component {
   render () {
     return (
       <div>
@@ -9,6 +9,6 @@ const ProfileView = React.createClass({
       </div>
     );
   }
-});
+}
 
 export default ProfileView;

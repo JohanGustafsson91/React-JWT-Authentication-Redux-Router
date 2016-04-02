@@ -8,23 +8,18 @@ import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import '../styles/_stylesheet.scss';
 import Menu from '../components/menu/Menu';
 
-const App = React.createClass({
+class App extends React.Component {
 
-  propTypes: {
-    isAuthenticated: PropTypes.bool,
-    name: PropTypes.string,
-    dispatch: PropTypes.func,
-    children: PropTypes.object
-  },
+  constructor (props) {
+    super(props);
 
-  /**
-   * Specify the different types of menu items
-   * for the application in the initial state.
-   *
-   * @author Johan Gustafsson <johan.gustafsson@solidio.se>
-   */
-  getInitialState () {
-    return {
+    this._getMenuItems = this._getMenuItems.bind(this);
+    this._getMenuBrand = this._getMenuBrand.bind(this);
+    this._redirectTo = this._redirectTo.bind(this);
+    this._logout = this._logout.bind(this);
+    this._toggleMenu = this._toggleMenu.bind(this);
+
+    this.state = {
       guestMenuItems: [
         {name: 'Home', handler: this._redirectTo, url: '/'},
         {name: 'Login', handler: this._redirectTo, url: '/login'}
@@ -33,46 +28,66 @@ const App = React.createClass({
         {name: 'Home', handler: this._redirectTo, url: '/'},
         {name: 'Profile', handler: this._redirectTo, url: '/profile'},
         {name: 'Logout', handler: this._logout, url: null}
-      ]
+      ],
+      showMenu: false
     };
-  },
+  }
 
   /**
    * @return {[Menu]} [Correct menu]
    * @author Johan Gustafsson <johan.gustafsson@solidio.se>
    */
   _getMenu () {
-    // Get specifik menu options
+    let { showMenu } = this.state;
     let menuItems = this._getMenuItems();
     let menuBrand = this._getMenuBrand();
 
     return (
       <Menu
         menuItems={menuItems}
-        menuBrand={menuBrand} />
+        menuBrand={menuBrand}
+        showMenu={showMenu}
+        toggleMenu={this._toggleMenu} />
     );
-  },
+  }
+
+  /**
+   * @param  {[boolean]} state [false -> close menu]
+   * @author Johan Gustafsson <johan.gustafsson@solidio.se>
+   */
+  _toggleMenu (state = null) {
+    let { showMenu } = this.state;
+
+    this.setState({
+      showMenu: state === null ? !showMenu : false
+    });
+  }
 
   /**
    * @return {[array]} [Array with correct menu items for menu]
    * @author Johan Gustafsson <johan.gustafsson@solidio.se>
    */
   _getMenuItems () {
-    if (this.props.isAuthenticated) {
-      return this.state.authMenuItems;
+    let { isAuthenticated } = this.props;
+    let { authMenuItems, guestMenuItems } = this.state;
+
+    if (isAuthenticated) {
+      return authMenuItems;
     } else {
-      return this.state.guestMenuItems;
+      return guestMenuItems;
     }
-  },
+  }
 
   /**
    * @return {[object]} [Menu brand]
    * @author Johan Gustafsson <johan.gustafsson@solidio.se>
    */
   _getMenuBrand () {
-    if (this.props.isAuthenticated) {
+    let { isAuthenticated, name } = this.props;
+
+    if (isAuthenticated) {
       return {
-        name: 'Welcome ' + this.props.name,
+        name: 'Welcome ' + name,
         handler: this._redirectTo,
         url: '/profile'
       };
@@ -83,44 +98,51 @@ const App = React.createClass({
         url: '/'
       };
     }
-  },
+  }
 
   /**
    * @param  {[string]} url [the new url]
    * @author Johan Gustafsson <johan.gustafsson@solidio.se>
    */
   _redirectTo (url) {
-    this.props.dispatch(
-      push(url)
-    );
-  },
+    let { dispatch } = this.props;
+    this._toggleMenu(false);
+    dispatch(push(url));
+  }
 
   /**
    * @author Johan Gustafsson <johan.gustafsson@solidio.se>
    */
   _logout () {
-    this.props.dispatch(
-      logoutAndRedirect()
-    );
-  },
+    let { dispatch } = this.props;
+    this._toggleMenu(false);
+    dispatch(logoutAndRedirect());
+  }
 
   render () {
+    let { children } = this.props;
+
     return (
       <div>
-        {
-          this._getMenu()
-        }
+        {this._getMenu()}
         <div className="container">
           <div className="row">
             <div className="col-xs-12">
-              {this.props.children}
+              {children}
             </div>
           </div>
         </div>
       </div>
     );
   }
-});
+}
+
+App.propTypes = {
+  isAuthenticated: PropTypes.bool,
+  name: PropTypes.string,
+  dispatch: PropTypes.func,
+  children: PropTypes.object
+};
 
 const mapStateToProps = (state) => ({
   isAuthenticated: state.auth.isAuthenticated,

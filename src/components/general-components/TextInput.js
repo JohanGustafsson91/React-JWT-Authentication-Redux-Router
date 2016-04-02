@@ -1,20 +1,6 @@
 import React, { PropTypes } from 'react';
 
-const TextInput = React.createClass({
-
-  propTypes: {
-    type: PropTypes.string.isRequired,
-    className: PropTypes.string,
-    style: PropTypes.object,
-    keyName: PropTypes.string,
-    placeholder: PropTypes.string,
-    onChange: PropTypes.func,
-    onBlur: PropTypes.func,
-    value: PropTypes.string,
-    disabled: PropTypes.bool,
-    defaultValue: PropTypes.string
-  },
-
+class TextInput extends React.Component {
   render () {
     return (
       <input
@@ -29,6 +15,19 @@ const TextInput = React.createClass({
         onBlur={this.props.onBlur} />
     );
   }
-});
+}
+
+TextInput.propTypes = {
+  type: PropTypes.string.isRequired,
+  className: PropTypes.string,
+  style: PropTypes.object,
+  keyName: PropTypes.string,
+  placeholder: PropTypes.string,
+  onChange: PropTypes.func,
+  onBlur: PropTypes.func,
+  value: PropTypes.string,
+  disabled: PropTypes.bool,
+  defaultValue: PropTypes.string
+};
 
 export default TextInput;
