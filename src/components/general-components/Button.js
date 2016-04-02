@@ -1,22 +1,10 @@
 import React, {PropTypes} from 'react';
 var classNames = require('classnames');
 
-const Button = React.createClass({
-
-  propTypes: {
-    text: PropTypes.string,
-    onClick: PropTypes.func.isRequired,
-    icon: PropTypes.string,
-    baseStyle: PropTypes.string,
-    loading: PropTypes.bool,
-    style: PropTypes.string,
-    disabled: PropTypes.bool
-  },
-
+class Button extends React.Component {
   render () {
     const {text, onClick, icon, baseStyle, loading} = this.props;
-    let iconStyles, buttonStyles;
-    let iconContent;
+    let iconStyles, buttonStyles, iconContent;
 
     buttonStyles = classNames(baseStyle, {
       'loading': loading,
@@ -46,6 +34,16 @@ const Button = React.createClass({
       </button>
     );
   }
-});
+}
+
+Button.propTypes = {
+  text: PropTypes.string,
+  onClick: PropTypes.func.isRequired,
+  icon: PropTypes.string,
+  baseStyle: PropTypes.string,
+  loading: PropTypes.bool,
+  style: PropTypes.string,
+  disabled: PropTypes.bool
+};
 
 export default Button;

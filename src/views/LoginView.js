@@ -7,61 +7,54 @@ import Button from '../components/general-components/Button';
 import CheckBox from '../components/general-components/CheckBox';
 import TextInput from '../components/general-components/TextInput';
 
-const LoginView = React.createClass({
+class LoginView extends React.Component {
 
-  propTypes: {
-    isAuthenticated: PropTypes.bool.isRequired,
-    isAuthenticating: PropTypes.bool.isRequired,
-    isLoading: PropTypes.bool.isRequired,
-    dispatch: PropTypes.func.isRequired,
-    location: PropTypes.object.isRequired,
-    errorText: PropTypes.string
-  },
+  constructor (props) {
+    super(props);
 
-  /**
-  * Only for UI components
-  */
-  getInitialState () {
-    return {
+    this.state = {
       username: '',
       password: '',
       remember: false
     };
-  },
+
+    this._redirectFromLogin = this._redirectFromLogin.bind(this);
+  }
 
   componentWillMount () {
     this._redirectFromLogin();
-  },
+  }
 
   componentWillReceiveProps (nextProps) {
     this._redirectFromLogin();
-  },
+  }
 
   /**
    * Redirect user from login page if already logged in.
    * @author Johan Gustafsson <johan.gustafsson@solidio.se>
    */
   _redirectFromLogin () {
-    if (this.props.isAuthenticated) {
-      this.props.dispatch(
-        push(this.props.location.query.next || '/profile')
+    let { isAuthenticated, dispatch, location } = this.props;
+
+    if (isAuthenticated) {
+      dispatch(
+        push(location.query.next || '/profile')
       );
     }
-  },
+  }
 
   /**
    * @author Johan Gustafsson <johan.gustafsson@solidio.se>
    */
   _login () {
-    const username = this.state.username;
-    const password = this.state.password;
-    const remember = this.state.remember;
-    const redirectRoute = this.props.location.query.next || '/login';
+    let { username, password, remember } = this.state;
+    let { dispatch, location } = this.props;
+    const redirectRoute = location.query.next || '/login';
 
-    this.props.dispatch(
+    dispatch(
       loginUser(username, password, remember, redirectRoute)
     );
-  },
+  }
 
   /**
    * @return {[component]} [PageLoading]
@@ -71,17 +64,20 @@ const LoginView = React.createClass({
     return (
       <PageLoading />
     );
-  },
+  }
 
   render () {
+    let { isLoading, errorText, isAuthenticating } = this.props;
+    let { username, password, remember } = this.state;
+
     // If validating, dont show login view
-    if (this.props.isLoading) {
+    if (isLoading) {
       return this._getLoadingView();
     }
 
     // Login error message
-    let errorMessage = this.props.errorText ?
-    <p className="text-danger">{this.props.errorText}</p> : '';
+    let errorMessage = errorText ?
+    <p className="text-danger">{errorText}</p> : '';
 
     return (
       <div className="row">
@@ -94,9 +90,9 @@ const LoginView = React.createClass({
               <TextInput
                 type="text"
                 className="form-control"
-                disabled={this.props.isAuthenticating}
+                disabled={isAuthenticating}
                 placeholder="Enter username"
-                value={this.state.username}
+                value={username}
                 onChange={(e) => {
                   this.setState({
                     username: e.target.value
@@ -110,9 +106,9 @@ const LoginView = React.createClass({
               <TextInput
                 type="password"
                 className="form-control"
-                disabled={this.props.isAuthenticating}
+                disabled={isAuthenticating}
                 placeholder="Enter password"
-                value={this.state.password}
+                value={password}
                 onChange={(e) => {
                   this.setState({
                     password: e.target.value
@@ -125,10 +121,10 @@ const LoginView = React.createClass({
             <div className="col-xs-12 col-sm-6">
               <CheckBox
                 text="Remember me"
-                checked={this.state.remember}
+                checked={remember}
                 onClick={() => {
                   this.setState({
-                    remember: !this.state.remember
+                    remember: !remember
                   });
                 }} />
             </div>
@@ -136,8 +132,8 @@ const LoginView = React.createClass({
               <Button
                 text="Login"
                 baseStyle="btn btn-success"
-                onClick={this._login}
-                disabled={this.props.isAuthenticating} />
+                onClick={() => this._login()}
+                disabled={isAuthenticating} />
             </div>
           </div>
 
@@ -145,7 +141,16 @@ const LoginView = React.createClass({
       </div>
     );
   }
-});
+}
+
+LoginView.propTypes = {
+  isAuthenticated: PropTypes.bool.isRequired,
+  isAuthenticating: PropTypes.bool.isRequired,
+  isLoading: PropTypes.bool.isRequired,
+  dispatch: PropTypes.func.isRequired,
+  location: PropTypes.object.isRequired,
+  errorText: PropTypes.string
+};
 
 const mapStateToProps = (state) => ({
   isAuthenticated: state.auth.isAuthenticated,

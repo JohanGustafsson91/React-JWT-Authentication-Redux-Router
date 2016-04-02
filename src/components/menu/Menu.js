@@ -2,60 +2,30 @@ import React, { PropTypes } from 'react';
 import MenuItem from './MenuItem';
 import MenuBrand from './MenuBrand';
 import ToggleMenuButton from './ToggleMenuButton';
+import * as _ from 'lodash';
 
-const Menu = React.createClass({
+class Menu extends React.Component {
 
-  propTypes: {
-    menuItems: PropTypes.array.isRequired,
-    menuBrand: PropTypes.object
-  },
-
-  getInitialState () {
-    return {
-      showMenu: false
-    };
-  },
-
-  /**
-   * Close menu on new page if last state was opened.
-   * @author Johan Gustafsson <johan.gustafsson@solidio.se>
-   */
-  componentDidUpdate (prevProps, prevState) {
-    if (prevState.showMenu === true) {
-      this._toggleMenu();
-    }
-  },
-
-  /**
-   * @author Johan Gustafsson <johan.gustafsson@solidio.se>
-   */
-  _toggleMenu () {
-    this.setState({
-      showMenu: !this.state.showMenu
-    });
-  },
+  constructor (props) {
+    super(props);
+  }
 
   render () {
-    // Render menu items
-    let idCounter = 0;
-    let menuItems = this.props.menuItems.map((i) => {
-      // Generate unique key for react
-      let itemKey = 'menuItem_' + idCounter;
-      idCounter += 1;
+    let { menuItems, menuBrand, showMenu, toggleMenu } = this.props;
 
+    // Render menu items
+    let itemsInMenu = menuItems.map((i) => {
       return (
         <MenuItem
           handleClick={i.handler}
           name={i.name}
           url={i.url}
-          key={itemKey} />
+          key={_.uniqueId('menuItem_')} />
       );
     });
 
     // Menu state open/closed
-    let menuState = this.state.showMenu ?
-                    'navbar-collapse' :
-                    'collapse navbar-collapse';
+    let menuState = showMenu ? 'navbar-collapse' : 'collapse navbar-collapse';
 
     return (
       <nav className="navbar navbar-default">
@@ -64,21 +34,21 @@ const Menu = React.createClass({
 
             <ToggleMenuButton
               className="navbar-toggle"
-              opened={this.state.showMenu}
-              toggleMenu={this._toggleMenu}
+              opened={showMenu}
+              toggleMenu={() => toggleMenu()}
               openedIcon="fa fa-caret-square-o-up"
               closedIcon="fa fa-caret-square-o-down" />
 
             <MenuBrand
-              handleClick={this.props.menuBrand.handler}
-              url={this.props.menuBrand.url}
-              name={this.props.menuBrand.name} />
+              handleClick={menuBrand.handler}
+              url={menuBrand.url}
+              name={menuBrand.name} />
 
           </div>
 
           <div className={menuState}>
               <ul className="nav navbar-nav navbar-right">
-                {menuItems}
+                {itemsInMenu}
               </ul>
           </div>
 
@@ -86,6 +56,13 @@ const Menu = React.createClass({
       </nav>
     );
   }
-});
+}
+
+Menu.propTypes = {
+  menuItems: PropTypes.array.isRequired,
+  menuBrand: PropTypes.object,
+  showMenu: PropTypes.bool.isRequired,
+  toggleMenu: PropTypes.func.isRequired
+};
 
 export default Menu;
