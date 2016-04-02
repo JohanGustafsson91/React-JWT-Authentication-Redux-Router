@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { routeActions } from 'react-router-redux';
+import { push } from 'react-router-redux';
 import { logoutAndRedirect } from '../redux/actions/authentication';
 import '../../node_modules/font-awesome/scss/font-awesome.scss';
 import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
@@ -90,7 +90,7 @@ const App = React.createClass({
    */
   _redirectTo (url) {
     this.props.dispatch(
-      routeActions.push(url)
+      push(url)
     );
   },
 

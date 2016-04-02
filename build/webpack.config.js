@@ -16,7 +16,7 @@ const webpackConfig = {
   devtool: config.compiler_devtool,
   resolve: {
     root: paths.base(config.dir_client),
-    extensions: ['', '.js', '.jsx']
+    extensions: ['', '.js', '.jsx', '.json']
   },
   module: {}
 };
@@ -89,16 +89,28 @@ if (!__TEST__) {
 // ------------------------------------
 // Pre-Loaders
 // ------------------------------------
+/*
+[ NOTE ]
+We no longer use eslint-loader due to it severely impacting build
+times for larger projects. `npm run lint` still exists to aid in
+deploy processes (such as with CI), and it's recommended that you
+use a linting plugin for your IDE in place of this loader.
+
+If you do wish to continue using the loader, you can uncomment
+the code below and run `npm i --save-dev eslint-loader`. This code
+will be removed in a future release.
+
 webpackConfig.module.preLoaders = [{
   test: /\.(js|jsx)$/,
   loader: 'eslint',
   exclude: /node_modules/
-}];
+}]
 
 webpackConfig.eslint = {
   configFile: paths.base('.eslintrc'),
   emitWarning: __DEV__
-};
+}
+*/
 
 // ------------------------------------
 // Loaders
@@ -111,9 +123,29 @@ webpackConfig.module.loaders = [{
   query: {
     cacheDirectory: true,
     plugins: ['transform-runtime'],
-    presets: __DEV__
-      ? ['es2015', 'react', 'stage-0', 'react-hmre']
-      : ['es2015', 'react', 'stage-0']
+    presets: ['es2015', 'react', 'stage-0'],
+    env: {
+      development: {
+        plugins: [
+          ['react-transform', {
+            transforms: [{
+              transform: 'react-transform-hmr',
+              imports: ['react'],
+              locals: ['module']
+            }, {
+              transform: 'react-transform-catch-errors',
+              imports: ['react', 'redbox-react']
+            }]
+          }]
+        ]
+      },
+      production: {
+        plugins: [
+          'transform-react-remove-prop-types',
+          'transform-react-constant-elements'
+        ]
+      }
+    }
   }
 },
 {
@@ -121,60 +153,85 @@ webpackConfig.module.loaders = [{
   loader: 'json'
 }];
 
-// Styles
-const cssLoader = !config.compiler_css_modules
-  ? 'css?sourceMap'
-  : [
-    'css?modules',
-    'sourceMap',
+// ------------------------------------
+// Style Loaders
+// ------------------------------------
+// We use cssnano with the postcss loader, so we tell
+// css-loader not to duplicate minimization.
+const BASE_CSS_LOADER = 'css?sourceMap&-minimize';
+
+// Add any packge names here whose styles need to be treated as CSS modules.
+// These paths will be combined into a single regex.
+const PATHS_TO_TREAT_AS_CSS_MODULES = [
+  // 'react-toolbox', (example)
+];
+
+// If config has CSS modules enabled, treat this project's styles as CSS modules.
+if (config.compiler_css_modules) {
+  PATHS_TO_TREAT_AS_CSS_MODULES.push(
+    paths.base(config.dir_client).replace(/[\^\$\.\*\+\-\?\=\!\:\|\\\/\(\)\[\]\{\}\,]/g, '\\$&')
+  );
+}
+
+const isUsingCSSModules = !!PATHS_TO_TREAT_AS_CSS_MODULES.length;
+const cssModulesRegex = new RegExp(`(${PATHS_TO_TREAT_AS_CSS_MODULES.join('|')})`);
+
+// Loaders for styles that need to be treated as CSS modules.
+if (isUsingCSSModules) {
+  const cssModulesLoader = [
+    BASE_CSS_LOADER,
+    'modules',
     'importLoaders=1',
     'localIdentName=[name]__[local]___[hash:base64:5]'
   ].join('&');
 
+  webpackConfig.module.loaders.push({
+    test: /\.scss$/,
+    include: cssModulesRegex,
+    loaders: [
+      'style',
+      cssModulesLoader,
+      'postcss',
+      'sass?sourceMap'
+    ]
+  });
+
+  webpackConfig.module.loaders.push({
+    test: /\.css$/,
+    include: cssModulesRegex,
+    loaders: [
+      'style',
+      cssModulesLoader,
+      'postcss'
+    ]
+  });
+}
+
+// Loaders for files that should not be treated as CSS modules.
+const excludeCSSModules = isUsingCSSModules ? cssModulesRegex : false;
 webpackConfig.module.loaders.push({
   test: /\.scss$/,
-  include: /src/,
+  exclude: excludeCSSModules,
   loaders: [
     'style',
-    cssLoader,
+    BASE_CSS_LOADER,
     'postcss',
     'sass?sourceMap'
   ]
 });
-
 webpackConfig.module.loaders.push({
   test: /\.css$/,
-  include: /src/,
+  exclude: excludeCSSModules,
   loaders: [
     'style',
-    cssLoader,
+    BASE_CSS_LOADER,
     'postcss'
   ]
 });
 
-// Don't treat global SCSS as modules
-webpackConfig.module.loaders.push({
-  test: /\.scss$/,
-  exclude: /src/,
-  loaders: [
-    'style',
-    'css?sourceMap',
-    'postcss',
-    'sass?sourceMap'
-  ]
-});
-
-// Don't treat global, third-party CSS as modules
-webpackConfig.module.loaders.push({
-  test: /\.css$/,
-  exclude: /src/,
-  loaders: [
-    'style',
-    'css?sourceMap',
-    'postcss'
-  ]
-});
-
+// ------------------------------------
+// Style Configuration
+// ------------------------------------
 webpackConfig.sassLoader = {
   includePaths: paths.client('styles')
 };
@@ -189,6 +246,9 @@ webpackConfig.postcss = [
     discardComments: {
       removeAll: true
     },
+    discardUnused: false,
+    mergeIdents: false,
+    reduceIdents: false,
     safe: true,
     sourcemap: true
   })
@@ -215,9 +275,9 @@ webpackConfig.module.loaders.push(
 // http://stackoverflow.com/questions/34133808/webpack-ots-parsing-error-loading-fonts/34133809#34133809
 if (!__DEV__) {
   debug('Apply ExtractTextPlugin to CSS loaders.');
-  webpackConfig.module.loaders.filter(loader =>
-    loader.loaders && loader.loaders.find(name => /css/.test(name.split('?')[0]))
-  ).forEach(loader => {
+  webpackConfig.module.loaders.filter((loader) =>
+    loader.loaders && loader.loaders.find((name) => /css/.test(name.split('?')[0]))
+  ).forEach((loader) => {
     const [first, ...rest] = loader.loaders;
     loader.loader = ExtractTextPlugin.extract(first, rest.join('!'));
     delete loader.loaders;

@@ -2,7 +2,7 @@
 * Authentication actions
 */
 
-import { routeActions } from 'react-router-redux';
+import { push } from 'react-router-redux';
 import { checkHttpStatus } from '../utils';
 import * as LOG from '../utils/logging';
 import { messages } from '../utils/constants';
@@ -41,6 +41,7 @@ export function loginUser (username, password, remember, redirect = '/') {
         remember: remember
       })
     }).then(response => {
+      LOG.info('Login user ', response);
       if (response.status === 403) {
         dispatch(loginUserFailure({
           response: {
@@ -51,7 +52,7 @@ export function loginUser (username, password, remember, redirect = '/') {
       } else {
         return response.json().then(function (json) {
           dispatch(loginUserSuccess(json));
-          dispatch(routeActions.push(redirect));
+          dispatch(push(redirect));
         });
       }
     })
@@ -105,7 +106,7 @@ export function validateUserToken (redirect = '/') {
       LOG.info(response);
       try {
         dispatch(loginUserSuccess(response));
-        dispatch(routeActions.push(redirect));
+        dispatch(push(redirect));
       } catch (e) {
         LOG.error(e);
         dispatch(unauthorizedUserFailure({
@@ -254,12 +255,12 @@ export function logoutAndRedirect () {
     .then(req => req.json())
     .then(response => {
       dispatch(logout());
-      dispatch(routeActions.push('/login'));
+      dispatch(push('/login'));
     })
     .catch(error => {
       LOG.error(error);
       dispatch(logout());
-      dispatch(routeActions.push('/login'));
+      dispatch(push('/login'));
     });
   };
 }

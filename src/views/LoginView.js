@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { routeActions } from 'react-router-redux';
+import { push } from 'react-router-redux';
 import { loginUser } from '../redux/actions/authentication';
 import PageLoading from '../components/PageLoading';
 import Button from '../components/general-components/Button';
@@ -44,7 +44,7 @@ const LoginView = React.createClass({
   _redirectFromLogin () {
     if (this.props.isAuthenticated) {
       this.props.dispatch(
-        routeActions.push(this.props.location.query.next || '/profile')
+        push(this.props.location.query.next || '/profile')
       );
     }
   },

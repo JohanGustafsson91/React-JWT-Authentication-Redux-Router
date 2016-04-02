@@ -7,7 +7,7 @@ import ProfileView from 'views/ProfileView';
 import { requireAuthentication } from '../components/AuthenticatedComponent';
 import NotFoundView from 'views/NotFoundView';
 
-export default (
+export default (store) => (
   <Route path="/" component={App}>
     <IndexRoute component={HomeView} />
     <Route path="/login" component={LoginView} />
