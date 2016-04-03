@@ -90,7 +90,7 @@ function callApi (action, next) {
     next({ ...rest, payload: data, type: SUCCESS });
 
     // Redirect after success if it's specified
-    if (action.redirectSuccess !== undefined) {
+    if (action.redirectSuccess !== 'undefined') {
       next(push(action.redirectSuccess));
     }
   })
@@ -104,7 +104,7 @@ function callApi (action, next) {
     next({ ...rest, error, type: FAILURE });
 
     // Redirect after error if it's specified
-    if (action.redirectError !== undefined) {
+    if (action.redirectError !== 'undefined') {
       next(push(action.redirectError));
     }
   });
