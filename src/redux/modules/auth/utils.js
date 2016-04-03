@@ -54,6 +54,5 @@ export function getHeaders () {
 }
 
 export function removeToken () {
-  console.log('removeToken');
   localStorage.removeItem('auth');
 }

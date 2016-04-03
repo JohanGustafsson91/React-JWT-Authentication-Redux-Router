@@ -11,7 +11,6 @@ import { messages } from '../../../src/redux/utils/constants';
 // Reducer tests //
 ///////////////////
 
-
 test('Reducer -> Should return the initialState', t => {
   const expectedAction = {
     id: null,
