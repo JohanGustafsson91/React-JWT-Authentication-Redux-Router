@@ -6,7 +6,7 @@ import { syncHistoryWithStore } from 'react-router-redux';
 import makeRoutes from './routes';
 import Root from './containers/Root';
 import configureStore from './redux/configureStore';
-import {validateUserToken} from './redux/actions/authentication';
+import {validateUserToken} from './redux/modules/auth/authentication';
 
 // Configure history for react-router
 const browserHistory = useRouterHistory(createBrowserHistory)({
@@ -29,7 +29,8 @@ const history = syncHistoryWithStore(browserHistory, store, {
 const routes = makeRoutes(store);
 
 /**
- * Check if token is set and validate it
+ * If token is set on load a check is performed to see
+ * if the user has a valid token.
  */
 if (localStorage.getItem('auth') !== null) {
   store.dispatch(validateUserToken('/login'));

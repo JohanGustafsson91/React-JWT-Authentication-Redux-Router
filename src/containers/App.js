@@ -2,7 +2,7 @@ import 'babel-polyfill';
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
-import { logoutAndRedirect } from '../redux/actions/authentication';
+import { logoutUser } from '../redux/modules/auth/authentication';
 import '../../node_modules/font-awesome/scss/font-awesome.scss';
 import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import '../styles/_stylesheet.scss';
@@ -116,7 +116,7 @@ class App extends React.Component {
   _logout () {
     let { dispatch } = this.props;
     this._toggleMenu(false);
-    dispatch(logoutAndRedirect());
+    dispatch(logoutUser());
   }
 
   render () {

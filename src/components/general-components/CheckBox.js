@@ -28,7 +28,7 @@ class CheckBox extends React.Component {
       margin: '3px 0 0 10px'
     };
 
-    const {text, checked, design, onClick} = this.props;
+    const {text, checked, design, onClick, disabled} = this.props;
     let textContent, filled, checkboxStyles;
 
     checkboxStyles = classNames(design, {

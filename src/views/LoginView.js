@@ -1,11 +1,12 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
-import { loginUser } from '../redux/actions/authentication';
+import { loginUser } from '../redux/modules/auth/authentication';
 import PageLoading from '../components/PageLoading';
 import Button from '../components/general-components/Button';
 import CheckBox from '../components/general-components/CheckBox';
 import TextInput from '../components/general-components/TextInput';
+import { STATUS_LOGIN } from '../redux/modules/statuses/statuses';
 
 class LoginView extends React.Component {
 
@@ -47,8 +48,8 @@ class LoginView extends React.Component {
    * @author Johan Gustafsson <johan.gustafsson@solidio.se>
    */
   _login () {
-    let { username, password, remember } = this.state;
-    let { dispatch, location } = this.props;
+    const { username, password, remember } = this.state;
+    const { dispatch, location } = this.props;
     const redirectRoute = location.query.next || '/login';
 
     dispatch(
@@ -67,17 +68,17 @@ class LoginView extends React.Component {
   }
 
   render () {
-    let { isLoading, errorText, isAuthenticating } = this.props;
-    let { username, password, remember } = this.state;
+    const { loginStatus, errorText, isAuthenticating } = this.props;
+    const { username, password, remember } = this.state;
 
     // If validating, dont show login view
-    if (isLoading) {
+    if (loginStatus.inProgress === true) {
       return this._getLoadingView();
     }
 
     // Login error message
-    let errorMessage = errorText ?
-    <p className="text-danger">{errorText}</p> : '';
+    let errorMessage = loginStatus.status === 'error' ?
+    <p className="text-danger">{loginStatus.message}</p> : '';
 
     return (
       <div className="row">
@@ -90,7 +91,6 @@ class LoginView extends React.Component {
               <TextInput
                 type="text"
                 className="form-control"
-                disabled={isAuthenticating}
                 placeholder="Enter username"
                 value={username}
                 onChange={(e) => {
@@ -106,7 +106,6 @@ class LoginView extends React.Component {
               <TextInput
                 type="password"
                 className="form-control"
-                disabled={isAuthenticating}
                 placeholder="Enter password"
                 value={password}
                 onChange={(e) => {
@@ -133,7 +132,7 @@ class LoginView extends React.Component {
                 text="Login"
                 baseStyle="btn btn-success"
                 onClick={() => this._login()}
-                disabled={isAuthenticating} />
+              />
             </div>
           </div>
 
@@ -145,18 +144,14 @@ class LoginView extends React.Component {
 
 LoginView.propTypes = {
   isAuthenticated: PropTypes.bool.isRequired,
-  isAuthenticating: PropTypes.bool.isRequired,
-  isLoading: PropTypes.bool.isRequired,
+  loginStatus: PropTypes.object.isRequired,
   dispatch: PropTypes.func.isRequired,
-  location: PropTypes.object.isRequired,
-  errorText: PropTypes.string
+  location: PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) => ({
   isAuthenticated: state.auth.isAuthenticated,
-  isAuthenticating: state.auth.isAuthenticating,
-  isLoading: state.auth.isLoading,
-  errorText: state.auth.errorText
+  loginStatus: state.status[STATUS_LOGIN]
 });
 
 export default connect(mapStateToProps)(LoginView);
