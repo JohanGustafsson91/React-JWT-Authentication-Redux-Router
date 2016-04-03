@@ -31,21 +31,12 @@ Tests are written with [ADA](https://github.com/sindresorhus/ava#promise-support
 
 <br/>
 ##### Current code coverage
-| File                |  % Stmts | % Branch |  % Funcs |  % Lines |Uncovered Lines |
-| --------------------|----------|----------|----------|----------|----------------|
-|  modules/auth/      |      100 |    78.13 |      100 |      100 |                |
-|   - *authentication.js* |      100 |     87.5 |      100 |      100 |                |
-|   - *initialState.js*   |      100 |      100 |      100 |      100 |                |
-|   - *utils.js*          |      100 |    68.75 |      100 |      100 |                |
-|  modules/statuses/  |      100 |      100 |      100 |      100 |                |
-|   - *statuses.js*       |      100 |      100 |      100 |      100 |                |
-|  utils/             |      100 |      100 |      100 |      100 |                |
-|   - *constants.js*      |      100 |      100 |      100 |      100 |                |
-| **All files**           |      100 |    78.13 |      100 |      100 |                |
+![alt text](http://gropio.com/stek/file/jfs5ch)
 
 
 **Todos in tests:**
 - [ ] Tests for apiMiddleware
+- [ ] Tests for statusProgress
 - [ ] Add enzyme support
 
 <br/>
