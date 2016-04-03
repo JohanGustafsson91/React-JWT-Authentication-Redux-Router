@@ -64,10 +64,7 @@ export function auth (state = initialState, action) {
         name: null,
         email: null,
         role: null,
-        isAuthenticated: false,
-        isLoading: false,
-        errorText: null,
-        successText: 'You have been successfully logged out.'
+        isAuthenticated: false
       });
     }
 
@@ -132,7 +129,7 @@ export function validateUserToken (redirect = '/') {
     successMessage: messages.SUCCESS.LOGIN,
     errorMessage: messages.ERROR.LOGIN,
     redirectSuccess: redirect,
-    redirectError: redirect,
+    redirectError: '/login',
     types: [ STATUS_LOGIN, LOGIN_USER_SUCCESS, LOGIN_USER_FAILURE ]
   };
 }

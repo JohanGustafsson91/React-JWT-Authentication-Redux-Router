@@ -16,11 +16,30 @@
     "dev": "better-npm-run dev",
     "dev:nw": "npm run dev -- --nw",
     "dev:no-debug": "npm run dev -- --no_debug",
+    "test:ava": "ava",
+    "test:ava:dev": "ava --watch",
     "test": "better-npm-run test",
     "test:dev": "npm run test -- --watch",
     "deploy": "better-npm-run deploy",
     "flow:check": "babel-node bin/flow-check",
     "codecov": "cat coverage/*/lcov.info | codecov"
+  },
+  "ava": {
+    "files": [
+      "test/**/**/*.js"
+    ],
+    "source": [
+      "**/*.{js,jsx}",
+      "!dist/**/*"
+    ],
+    "match": [],
+    "failFast": true,
+    "tap": true,
+    "require": [
+      "babel-register",
+      "sinon"
+    ],
+    "babel": "inherit"
   },
   "betterScripts": {
     "compile": {
@@ -81,6 +100,7 @@
     "redux-thunk": "^2.0.0"
   },
   "devDependencies": {
+    "ava": "^0.13.0",
     "babel-cli": "^6.5.1",
     "babel-core": "^6.3.17",
     "babel-eslint": "^6.0.0-beta.6",
