@@ -8,15 +8,11 @@ Front end JWT authentication with React, Redux and Router.
 ***Description coming soon!***
 
 
-#### API Middleware
+##### API Middleware
 ***Description coming soon!***
 
 
-#### Modular ducks status reducer
-***Description coming soon!***
-
-
-#### Modular ducks status reducer
+##### Modular ducks status reducer
 ***Description coming soon!***
 
 
