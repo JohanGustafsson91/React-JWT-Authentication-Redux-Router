@@ -63,16 +63,16 @@ function callApi (action, next) {
   const { types, method, headers, body, API_URL, ...rest } = action;
   const [ STATUS, SUCCESS, FAILURE ] = types;
 
-  // Dispatch loading status if it's specified
-  if (STATUS !== false) {
-    next(showStatus(STATUS, true, null, null));
-  }
-
   /* Specify api call parameters */
   let params = {};
   params.method = method || 'get';
   params.headers = headers || {};
   params.body = JSON.stringify(body) || {};
+
+  // Dispatch loading status if specified
+  if (STATUS !== false) {
+    next(showStatus(STATUS, true, null, null));
+  }
 
   /**
    * Perform the api call.
@@ -81,7 +81,7 @@ function callApi (action, next) {
   .then(checkStatus)
   .then(parseJSON)
   .then(data => {
-    // Dispatch and show success status if it's specified
+    // Dispatch and show success status if specified
     if (STATUS !== false) {
       next(showStatus(STATUS, false, 'success', action.successMessage));
     }
@@ -89,22 +89,24 @@ function callApi (action, next) {
     // Dispatch the success action
     next({ ...rest, payload: data, type: SUCCESS });
 
-    // Redirect after success if it's specified
-    if (action.redirectSuccess !== 'undefined') {
+    // Redirect after success if specified
+    if (action.redirectSuccess !== undefined) {
       next(push(action.redirectSuccess));
     }
   })
   .catch(error => {
-    // Dispatch and show error status if it's specified
+    // Dispatch and show error status if specified
     if (STATUS !== false) {
       next(showStatus(STATUS, false, 'error', action.errorMessage));
     }
 
-    // Dispatch error action
-    next({ ...rest, error, type: FAILURE });
+    /* The FAILURE action is optional.
+    Set it to false if not specified so it can be dispatched
+    (actions should not have an undefined "type" property). */
+    next({ ...rest, error, type: FAILURE === undefined ? false : FAILURE });
 
-    // Redirect after error if it's specified
-    if (action.redirectError !== 'undefined') {
+    // Redirect after error if specified
+    if (action.redirectError !== undefined) {
       next(push(action.redirectError));
     }
   });
