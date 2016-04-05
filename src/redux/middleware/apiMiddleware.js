@@ -20,7 +20,7 @@ export function apiMiddleware () {
  * @author Johan Gustafsson <johan.gustafsson@solidio.se>
  */
 function isRequest ({ API_URL }) {
-  return API_URL !== 'undefined' && typeof API_URL === 'string';
+  return API_URL !== undefined && typeof API_URL === 'string';
 }
 
 /**
@@ -67,7 +67,7 @@ function callApi (action, next) {
   let params = {};
   params.method = method || 'get';
   params.headers = headers || {};
-  params.body = JSON.stringify(body) || {};
+  params.body = JSON.stringify(body) || undefined;
 
   // Dispatch loading status if specified
   if (STATUS !== false) {
