@@ -36,7 +36,7 @@ Tests are written with [ADA](https://github.com/sindresorhus/ava#promise-support
 
 **Todos in tests:**
 - [ ] Tests for apiMiddleware
-- [ x ] Tests for statusProgress
+- [x] Tests for statusProgress
 - [ ] Add enzyme support
 
 <br/>
