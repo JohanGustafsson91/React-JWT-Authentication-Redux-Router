@@ -31,12 +31,12 @@ Tests are written with [ADA](https://github.com/sindresorhus/ava#promise-support
 
 <br/>
 ##### Current code coverage
-![alt text](http://gropio.com/stek/file/jfs5ch)
+![alt text](http://gropio.com/stek/file/2kcdvv)
 
 
 **Todos in tests:**
 - [ ] Tests for apiMiddleware
-- [ ] Tests for statusProgress
+- [ x ] Tests for statusProgress
 - [ ] Add enzyme support
 
 <br/>
